@@ -34,6 +34,10 @@ class MongoRegisteredClientRepository(
 		return findOneBy(Criteria.where("clientId").`is`(clientId))
 	}
 
+	fun deleteAll() {
+		mongoTemplate?.remove(Query(), RegisteredClient::class.java)
+	}
+
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
 

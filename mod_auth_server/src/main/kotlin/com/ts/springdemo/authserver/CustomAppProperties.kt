@@ -36,9 +36,15 @@ data class CustomAppProperties(
 	data class AuthServer(
 				val providerIssuerUrl: String,
 				val enablePostmanCallback: Boolean = false,
+				val db: DbConf,
 				var users: Map<String, AuthUserConf>,
 				var oauth2Clients: Map<String, OAuth2ClientConf>
 			) {
+
+		data class DbConf(
+					val pruneCollections: Boolean = false,
+					val initCollections: Boolean = true
+				)
 
 		data class AuthUserConf(
 					var role: AuthRole.EnRoles,
@@ -111,7 +117,9 @@ data class CustomAppProperties(
 					var scopesResourceAccess: Map<String, ResourceAccessUriMethods>?
 				)
 
-		data class ResourceAccessUriMethods(var methods: List<AuthRscAcc.EnMeth>)
+		data class ResourceAccessUriMethods(
+					var methods: List<AuthRscAcc.EnMeth>
+				)
 	}
 
 	data class ClientWebApp(

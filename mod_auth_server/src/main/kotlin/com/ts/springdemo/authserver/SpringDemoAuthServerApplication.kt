@@ -6,7 +6,9 @@ import com.ts.springdemo.common.constants.OauthGrantType
 import com.ts.springdemo.authserver.entity.CustomAuthUser
 import com.ts.springdemo.authserver.entity.RscIdPaths
 import com.ts.springdemo.authserver.entity.oidc.CustomOidcUserInfo
+import com.ts.springdemo.authserver.mongoshim.MongoRegisteredClientRepository
 import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
+import com.ts.springdemo.authserver.repository.CustomOAuth2AuthorizationRepository
 import com.ts.springdemo.authserver.repository.RscIdPathsRepository
 import com.ts.springdemo.authserver.repository.oidc.CustomOidcUserInfoRepository
 import com.ts.springdemo.authserver.service.RscIdPathsService
@@ -16,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
@@ -43,8 +46,12 @@ class SpringDemoAuthServerApplication(
 			@Autowired
 			private val rscIdPathsRepository: RscIdPathsRepository,
 			@Autowired
-			private val rscIdPathsService: RscIdPathsService
-		) {
+			private val rscIdPathsService: RscIdPathsService,
+			@Autowired
+			private val mongoTemplate: MongoTemplate,
+			@Autowired
+			private val customOAuth2AuthorizationRepository: CustomOAuth2AuthorizationRepository
+) {
 
 	@Bean
 	fun init(): CommandLineRunner? {
@@ -56,14 +63,20 @@ class SpringDemoAuthServerApplication(
 				println("----------------------------------------")
 				println("----------------------------------------")
 				println("----------------------------------------")
-				initResourceIdToPathsMappings()
-				println("----------------------------------------")
-				initCustomAuthUsers()
-				println("----------------------------------------")
-				initCustomOidcUserInfos()
-				println("----------------------------------------")
-				initRegisteredClientRepository()
-				println("----------------------------------------")
+				if (customAppProperties.authServer.db.pruneCollections) {
+					pruneCollections()
+					println("----------------------------------------")
+				}
+				if (customAppProperties.authServer.db.initCollections) {
+					initResourceIdToPathsMappings()
+					println("----------------------------------------")
+					initCustomAuthUsers()
+					println("----------------------------------------")
+					initCustomOidcUserInfos()
+					println("----------------------------------------")
+					initRegisteredClientRepository()
+					println("----------------------------------------")
+				}
 				val cwaUrl = customAppProperties.clientWebApp.url
 				println("ClientWebApp URL='$cwaUrl' (important for Authentication Code)")
 				val piUrl = customAppProperties.authServer.providerIssuerUrl
@@ -77,6 +90,22 @@ class SpringDemoAuthServerApplication(
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
+
+	private fun pruneCollections() {
+		println("Prune Collections")
+		println("  - rscIdPaths")
+		rscIdPathsRepository.deleteAll()
+		println("  - authUser")
+		customAuthUserRepository.deleteAll()
+		println("  - oidcUserInfo")
+		customOidcUserInfoRepository.deleteAll()
+		println("  - customOauth2Authorization")
+		customOAuth2AuthorizationRepository.deleteAll()
+		//
+		println("  - registeredClient")
+		val mongoRegClientRepo = MongoRegisteredClientRepository(mongoTemplate)
+		mongoRegClientRepo.deleteAll()
+	}
 
 	private fun initResourceIdToPathsMappings() {
 		customAppProperties.resourceIdToUrlPaths.forEach { (itRscId: String, itRscEntry: CustomAppProperties.ResourceIdToUrlPathsEntry) ->
