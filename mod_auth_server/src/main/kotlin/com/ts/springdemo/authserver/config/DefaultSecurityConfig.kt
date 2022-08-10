@@ -82,9 +82,6 @@ class DefaultSecurityConfig(
 							}
 							response.sendRedirect(targetUrl)
 						}
-				.and()
-				.exceptionHandling()
-					.accessDeniedPage("/error/forbidden")
 		return http.build()
 	}
 

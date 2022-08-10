@@ -31,9 +31,4 @@ class WebUiController(
 		val outUsername = oidcUserInfo?.getName() ?: authUser.getEmail()
 		return "Hello $outUsername"
 	}
-
-	@GetMapping("/error/forbidden")
-	fun getUiErrorForbidden(): String {
-		return "Forbidden"
-	}
 }
