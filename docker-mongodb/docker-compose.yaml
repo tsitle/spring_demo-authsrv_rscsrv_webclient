@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      #- $PWD/mpdata:/data/db
+      - $PWD/user_setup/create_user-authsrv.js:/docker-entrypoint-initdb.d/create_user-authsrv.js:ro
+      - $PWD/user_setup/create_user-rscsrv.js:/docker-entrypoint-initdb.d/create_user-rscsrv.js:ro
+    restart: always
+    stdin_open: false
+    tty: false
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: abcd
+      MONGO_INITDB_DATABASE: admin
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8070:8081"
+    restart: always
+    stdin_open: false
+    tty: false
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: abcd
+      ME_CONFIG_MONGODB_URL: mongodb://root:abcd@mongo:27017/admin
