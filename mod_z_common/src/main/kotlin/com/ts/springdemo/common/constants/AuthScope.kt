@@ -9,8 +9,6 @@ class AuthScope {
 		/** GrantedAuthority prefix */
 		@Suppress("WeakerAccess")
 		const val GA_PREFIX = "SCOPE_"
-		/** Scope prefix for impersonating user roles */
-		const val SCOPE_IMPERSONATE_ROLE_PREFIX = "impersonate.role."
 
 		fun buildAuthScope(scope: EnScopes): String {
 			return GA_PREFIX + scope.value
