@@ -1,22 +1,17 @@
 package com.ts.springdemo.rscserver.ctrlapi
 
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.BodyInserters
-import org.springframework.web.reactive.function.client.ClientRequest
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.server.ResponseStatusException
-import reactor.core.publisher.Mono
 
 
 @RestController
@@ -59,11 +54,11 @@ class ApiUserinfoController {
 		val res: MutableMap<String, String> = HashMap()
 		try {
 			val srvResp: MutableMap<*, *>? = WebClient.builder()
-					.filter(
-							oauth2CredentialsExchangeFilter(authorizedClientsAccessTokenValue)
-						)
 					.build()
 					.post().uri(userInfoEndpointUri)
+					.headers { headers ->
+							headers.setBearerAuth(authorizedClientsAccessTokenValue)
+						}
 					.body(
 							BodyInserters.fromFormData(formData)
 						)
@@ -86,17 +81,5 @@ class ApiUserinfoController {
 			res["error"] = "MethodNotAllowed, URL=$userInfoEndpointUri"
 		}
 		return res
-	}
-
-	private fun oauth2CredentialsExchangeFilter(authorizedClientsAccessTokenValue: String): ExchangeFilterFunction {
-		return ExchangeFilterFunction.ofRequestProcessor { clientRequest ->
-				val authorizedRequest: ClientRequest = ClientRequest.from(clientRequest)
-						.header(
-								HttpHeaders.AUTHORIZATION,
-								OAuth2AccessToken.TokenType.BEARER.value + " " + authorizedClientsAccessTokenValue
-							)
-						.build()
-				Mono.just(authorizedRequest)
-			}
 	}
 }
