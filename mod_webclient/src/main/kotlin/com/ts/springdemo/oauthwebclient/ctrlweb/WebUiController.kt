@@ -1,5 +1,8 @@
 package com.ts.springdemo.oauthwebclient.ctrlweb
 
+import com.ts.springdemo.common.constants.AuthScope
+import com.ts.springdemo.common.constants.AuthSrvOauth
+import com.ts.springdemo.common.constants.OauthGrantType
 import com.ts.springdemo.oauthwebclient.repository.CustomClientRegistrationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -16,11 +19,12 @@ import org.springframework.security.oauth2.core.oidc.AddressStandardClaim
 import org.springframework.security.oauth2.core.oidc.OidcIdToken
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientException
-import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.*
 import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -36,11 +40,14 @@ class WebUiController(
 			private val cfgAuthSrvUrl: String,
 			@Value("\${custom-app.resource-server.url}")
 			private val cfgRscSrvUrl: String,
+			@Value("\${custom-app.client-web-app.url}")
+			private val cfgClientWebAppUrl: String,
 			@Value("\${custom-app.client-web-app.internal-client-id}")
 			private val cfgClientWebAppInternalClientId: String
 		) {
 
 	@GetMapping("/")
+	@Throws(ResponseStatusException::class)
 	fun getUiRoot(authentication: OAuth2AuthenticationToken): String {
 		if (authentication.principal == null) {
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Authentication")
@@ -52,6 +59,53 @@ class WebUiController(
 				authentication.principal.name
 			}
 		return "Hello $username"
+	}
+
+	@GetMapping(value = ["/custom/authcode/fetch"])
+	@Throws(ResponseStatusException::class)
+	fun getCustomAuthcodeFetch(response: HttpServletResponse) {
+		val oauth2ClientReg: ClientRegistration = customClientRegistrationRepository.findByRegistrationId(cfgClientWebAppInternalClientId) ?:
+				throw ResponseStatusException(HttpStatus.BAD_REQUEST, "OAuth2 Client '$cfgClientWebAppInternalClientId' not found")
+
+		val redirUrl = cfgAuthSrvUrl + AuthSrvOauth.URL_PATH_AUTHORIZATION + "?" +
+				"response_type=code&" +
+				"client_id=${oauth2ClientReg.clientId}&" +
+				"redirect_uri=$cfgClientWebAppUrl/custom/authcode/authorized&" +
+				"scope=" + AuthScope.EnScopes.OPENID.value
+		response.setHeader("Location", redirUrl)
+		response.status = 302
+	}
+
+	@GetMapping(value = ["/custom/authcode/authorized"])
+	@Throws(ResponseStatusException::class)
+	fun getCustomAuthcodeAuthorized(code: String?, error: String?): String {
+		if (! error.isNullOrEmpty()) {
+			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Error: $error")
+		}
+		if (code.isNullOrEmpty()) {
+			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing code")
+		}
+		val tokenData = getAccTokenFromAuthServer(code)
+		var resStr = "The Code was:<br>" +
+				"<pre style='font-size:90%'>$code</pre>"
+		if (tokenData.containsKey("error")) {
+			resStr += "Error:" +
+					"<pre style='font-size:90%'>" + tokenData["error"] + "</pre>"
+		} else {
+			resStr += "Access Token:<br>" +
+					"<pre style='font-size:90%'>" + tokenData["access_token"] + "</pre>" +
+					"Refresh Token:<br>" +
+					"<pre style='font-size:90%'>" + tokenData["refresh_token"] + "</pre>" +
+					"Token Type:<br>" +
+					"<pre style='font-size:90%'>" + tokenData["token_type"] + "</pre>" +
+					"Expires in:<br>" +
+					"<pre style='font-size:90%'>" + tokenData["expires_in"] + "</pre>" +
+					"Scope:<br>" +
+					"<pre style='font-size:90%'>" + tokenData["scope"] + "</pre>" +
+					"ID Token:<br>" +
+					"<pre style='font-size:90%'>" + tokenData["id_token"] + "</pre>"
+		}
+		return resStr
 	}
 
 	@GetMapping(value = ["/articles"])
@@ -147,6 +201,7 @@ class WebUiController(
 		return value?.toString() ?: "NULL"
 	}
 
+	@Throws(ClientAuthorizationException::class)
 	private fun getStringArray(reqUrl: String): Array<String>? {
 		val oauth2ClientReg: ClientRegistration? = customClientRegistrationRepository.findByRegistrationId(cfgClientWebAppInternalClientId)
 		//
@@ -230,5 +285,48 @@ class WebUiController(
 					"error=" + err.message
 				).toTypedArray()
 		}
+	}
+
+	@Throws(ResponseStatusException::class)
+	private fun getAccTokenFromAuthServer(code: String): Map<String, String> {
+		val tokenEndpointUri: String = cfgAuthSrvUrl + AuthSrvOauth.URL_PATH_TOKEN
+		val oauth2ClientReg: ClientRegistration = customClientRegistrationRepository.findByRegistrationId(cfgClientWebAppInternalClientId) ?:
+				throw ResponseStatusException(HttpStatus.BAD_REQUEST, "OAuth2 Client '$cfgClientWebAppInternalClientId' not found")
+
+		val formData: MultiValueMap<String, String> = LinkedMultiValueMap()
+		formData.add("grant_type", OauthGrantType.EnGrantType.AUTH_CODE.value)
+		formData.add("code", code)
+		formData.add("redirect_uri", "$cfgClientWebAppUrl/custom/authcode/authorized")
+
+		val res: MutableMap<String, String> = HashMap()
+		try {
+			val srvResp: MutableMap<*, *>? = WebClient.builder()
+					.build()
+					.post().uri(tokenEndpointUri)
+					.headers {headers ->
+							headers.setBasicAuth(oauth2ClientReg.clientId, oauth2ClientReg.clientSecret)
+						}
+					.body(
+							BodyInserters.fromFormData(formData)
+						)
+					.retrieve()
+					.bodyToMono(MutableMap::class.java)
+					.block()
+			if (srvResp != null) {
+				@Suppress("UNCHECKED_CAST")
+				res.putAll(srvResp as Map<String, String>)
+			}
+		} catch (err: WebClientResponseException.BadRequest) {
+			res["error"] = "BadRequest, URL=${tokenEndpointUri}, Message: ${err.message}"
+		} catch (err: WebClientResponseException.Unauthorized) {
+			res["error"] = "Unauthorized, URL=$tokenEndpointUri"
+		} catch (err: WebClientResponseException.Forbidden) {
+			res["error"] = "Forbidden, URL=$tokenEndpointUri"
+		} catch (err: WebClientResponseException.NotFound) {
+			res["error"] = "NotFound, URL=$tokenEndpointUri"
+		} catch (err: WebClientResponseException.MethodNotAllowed) {
+			res["error"] = "MethodNotAllowed, URL=$tokenEndpointUri"
+		}
+		return res
 	}
 }

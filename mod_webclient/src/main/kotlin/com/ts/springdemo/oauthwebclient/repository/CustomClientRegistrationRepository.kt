@@ -61,13 +61,16 @@ class CustomClientRegistrationRepository(
 				.issuerUri(cfgAuthSrvIssuerUrl)
 				.userInfoUri(cfgAuthSrvIssuerUrl + AuthSrvOauth.URL_PATH_USERINFO)
 				.userNameAttributeName(AuthSrvOauth.ATTR_USERINFO_USERNAME_KEY)
-		cr.redirectUri(
-				"$cfgClientWebAppUrl/login/oauth2/code/$internalClientId"
-				/*"$cfgClientWebAppUrl/authorized"*/
-			)
-		cr.scope(
-				getScopesList(client.additionalScopes)
-			)
+				.scope(
+						getScopesList(client.additionalScopes)
+					)
+				.redirectUri(
+						if (internalClientId != "customauthcodetest-authorization_code") {
+							"$cfgClientWebAppUrl/login/oauth2/code/$internalClientId"
+						} else {
+							"$cfgClientWebAppUrl/custom/authcode/authorized"
+						}
+					)
 		return cr.build()
 	}
 

@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableWebSecurity
 class SecurityConfig(
 			@Value("\${custom-app.client-web-app.internal-client-id}")
-			private val cfgClientWebAppRegClientId: String,
+			private val cfgClientWebAppInternalClientId: String,
 			@Autowired
 			private val customOidcUserService: CustomOidcUserService
 		) {
@@ -38,7 +38,10 @@ class SecurityConfig(
 		http
 				.authorizeRequests { authorizeRequestsCustomizer ->
 						authorizeRequestsCustomizer
-								.antMatchers(HttpMethod.GET, "/logout/**", "/logged_out/**", "/error/forbidden/**")
+								.antMatchers(HttpMethod.GET,
+										"/logout/**", "/logged_out/**",
+										"/custom/authcode/fetch", "/custom/authcode/authorized",
+										"/error/forbidden/**")
 								.permitAll()
 						authorizeRequestsCustomizer
 								.antMatchers(HttpMethod.GET, pathUiRoot)
@@ -46,15 +49,18 @@ class SecurityConfig(
 						authorizeRequestsCustomizer
 								.anyRequest().authenticated()
 					}
-				.oauth2Login { oauth2LoginCustomizer: OAuth2LoginConfigurer<HttpSecurity?> ->
-						oauth2LoginCustomizer.loginPage(
-								"/oauth2/authorization/$cfgClientWebAppRegClientId"
-							)
-						oauth2LoginCustomizer.userInfoEndpoint().oidcUserService(customOidcUserService)
-					}
 				.oauth2Client(Customizer.withDefaults())
 				.exceptionHandling()
 						.accessDeniedPage("/error/forbidden")
+		if (cfgClientWebAppInternalClientId != "customauthcodetest-authorization_code") {
+			http
+					.oauth2Login { oauth2LoginCustomizer: OAuth2LoginConfigurer<HttpSecurity?> ->
+							oauth2LoginCustomizer.loginPage(
+									"/oauth2/authorization/$cfgClientWebAppInternalClientId"
+								)
+							oauth2LoginCustomizer.userInfoEndpoint().oidcUserService(customOidcUserService)
+						}
+		}
 		return http.build()
 	}
 }
