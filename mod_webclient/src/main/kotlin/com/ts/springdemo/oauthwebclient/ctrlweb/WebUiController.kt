@@ -177,7 +177,7 @@ class WebUiController(
 
 	@GetMapping(value = ["/logout"])
 	fun getLogout(request: HttpServletRequest, response: HttpServletResponse) {
-		val redirUrl = "${cfgAuthSrvUrl}/logout?redirect_to_logged_out=1"
+		val redirUrl = "${cfgAuthSrvUrl}/logout?" + AuthSrvOauth.URL_PARAM_LOGOUT_PAGE_REDIRECT_TO_WEBCLIENT + "=1"
 		response.setHeader("Location", redirUrl)
 		response.status = 302
 	}

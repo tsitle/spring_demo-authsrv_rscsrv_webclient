@@ -3,6 +3,7 @@ package com.ts.springdemo.authserver.config
 import com.ts.springdemo.common.constants.AuthRole
 import com.ts.springdemo.authserver.service.CustomAuthenticationProvider
 import com.ts.springdemo.common.constants.AuthRscAcc
+import com.ts.springdemo.common.constants.AuthSrvOauth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -75,7 +76,7 @@ class DefaultSecurityConfig(
 				.logout()
 					.logoutSuccessHandler { request, response, _ ->
 							var targetUrl = "/login"
-							val param: String? = request.getParameter("redirect_to_logged_out")
+							val param: String? = request.getParameter(AuthSrvOauth.URL_PARAM_LOGOUT_PAGE_REDIRECT_TO_WEBCLIENT)
 							if (! param.isNullOrEmpty()) {
 								targetUrl = "${cfgClientWebAppUrl}${cfgClientWebAppLoggeOutPage}"
 							}
@@ -83,7 +84,7 @@ class DefaultSecurityConfig(
 						}
 				.and()
 				.exceptionHandling()
-						.accessDeniedPage("/error/forbidden")
+					.accessDeniedPage("/error/forbidden")
 		return http.build()
 	}
 
