@@ -23,7 +23,7 @@ class ApiUserinfoController {
 
 	/** This endpoint can be reached with an OAuth2 Authorization Code or Client Credentials grant */
 	@PostMapping("/api/v1/userinfo")
-	fun postUserinfo(queryUserEmail: String?): Map<String, String> {
+	fun postUserinfo(queryUserEmail: String?): Map<String, Any> {
 		if (queryUserEmail == null || queryUserEmail.isEmpty()) {
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing queryUserEmail")
 		}
@@ -33,7 +33,7 @@ class ApiUserinfoController {
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private fun getUserInfoFromAuthServer(userEmail: String): Map<String, String> {
+	private fun getUserInfoFromAuthServer(userEmail: String): Map<String, Any> {
 		val authenticationPre = SecurityContextHolder.getContext().authentication ?:
 				throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "OAuth2 Login required")
 		if (authenticationPre is AnonymousAuthenticationToken) {
@@ -51,7 +51,7 @@ class ApiUserinfoController {
 		val formData: MultiValueMap<String, String> = LinkedMultiValueMap()
 		formData.add("queryUserEmail", userEmail)
 
-		val res: MutableMap<String, String> = HashMap()
+		val res: MutableMap<String, Any> = HashMap()
 		try {
 			val srvResp: MutableMap<*, *>? = WebClient.builder()
 					.build()
@@ -67,7 +67,7 @@ class ApiUserinfoController {
 					.block()
 			if (srvResp != null) {
 				@Suppress("UNCHECKED_CAST")
-				res.putAll(srvResp as Map<String, String>)
+				res.putAll(srvResp as Map<String, Any>)
 			}
 		} catch (err: WebClientResponseException.BadRequest) {
 			res["error"] = "BadRequest, URL=$userInfoEndpointUri"
