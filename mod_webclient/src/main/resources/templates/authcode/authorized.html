@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<h1>Web Client: Authorized</h1>
+	<div>
+		<ul>
+			<li>
+				<strong>The Code was:</strong>
+				<pre th:text="${code}"></pre>
+			</li>
+			<li th:if="${error} ne ''">
+				<strong>Error:</strong>
+				<pre th:text="${error}"></pre>
+			</li>
+			<li th:if="${error} eq ''">
+				<strong>Access Token:</strong>
+				<pre th:text="${td_access_token}"></pre>
+			</li>
+			<li th:if="${error} eq ''">
+				<strong>Refresh Token:</strong>
+				<pre th:text="${td_refresh_token}"></pre>
+			</li>
+			<li th:if="${error} eq ''">
+				<strong>Token Type:</strong>
+				<pre th:text="${td_token_type}"></pre>
+			</li>
+			<li th:if="${error} eq ''">
+				<strong>Expires in:</strong>
+				<pre th:text="${td_expires_in}"></pre>
+			</li>
+			<li th:if="${error} eq ''">
+				<strong>Scope:</strong>
+				<pre th:text="${td_scope}"></pre>
+			</li>
+			<li th:if="${error} eq ''">
+				<strong>ID Token:</strong>
+				<pre th:text="${td_id_token}"></pre>
+			</li>
+		</ul>
+	</div>
+	<p>
+		<a href="/">
+			<span>Home</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>

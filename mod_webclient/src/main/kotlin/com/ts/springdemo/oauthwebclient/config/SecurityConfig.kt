@@ -39,9 +39,9 @@ class SecurityConfig(
 				.authorizeRequests { authorizeRequestsCustomizer ->
 						authorizeRequestsCustomizer
 								.antMatchers(HttpMethod.GET,
-										"/logout/**", "/logged_out/**",
-										"/custom/authcode/fetch", "/custom/authcode/authorized",
-										"/error/forbidden/**")
+										"/logout/**", "/ui/logged_out/**",
+										"/custom/authcode/fetch", "/custom/authcode/authorized"
+									)
 								.permitAll()
 						authorizeRequestsCustomizer
 								.antMatchers(HttpMethod.GET, pathUiRoot)
@@ -50,8 +50,6 @@ class SecurityConfig(
 								.anyRequest().authenticated()
 					}
 				.oauth2Client(Customizer.withDefaults())
-				.exceptionHandling()
-						.accessDeniedPage("/error/forbidden")
 		if (cfgClientWebAppInternalClientId != "customauthcodetest-authorization_code") {
 			http
 					.oauth2Login { oauth2LoginCustomizer: OAuth2LoginConfigurer<HttpSecurity?> ->

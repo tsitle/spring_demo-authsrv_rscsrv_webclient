@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<h1>Web Client: Articles</h1>
+	<ul th:each="row : ${dataArr}">
+		<li>
+			<span th:text="${row}"></span>
+		</li>
+	</ul>
+	<p>
+		<a href="/">
+			<span>Home</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>

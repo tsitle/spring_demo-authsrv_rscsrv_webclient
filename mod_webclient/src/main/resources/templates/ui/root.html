@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<h1>Web Client: Home</h1>
+	<h3>
+		Hello <span th:text="${username}" style="color: green"></span>
+	</h3>
+	<p>
+		<a href="/ui/showOidcUserInfo">
+			<span>Check out your user info</span>
+		</a>
+	</p>
+	<p>
+		<a href="/ui/articles">
+			<span>See [Articles] from Resource Server</span>
+		</a>
+	</p>
+	<p>
+		<a href="/ui/products">
+			<span>See [Products] from Resource Server</span>
+		</a>
+	</p>
+	<p>
+		<a href="/custom/authcode/fetch">
+			<span>Fetch an Access Token via an Authorization Code Grant from Authorization Server</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>

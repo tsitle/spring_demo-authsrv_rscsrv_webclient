@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<h1>Web Client: OIDC User Info</h1>
+	<ul th:each="row : ${authInfoArr}">
+		<li th:if="${row.value} ne 'NULL'">
+			<strong th:text="${row.key} + ':'"></strong>
+			<div th:switch="${row.key}">
+				<div th:case="'Auth Authorities'">
+					<ul th:each="rowAuth : ${row.value}">
+						<li th:text="${rowAuth}"></li>
+					</ul>
+				</div>
+				<div th:case="*">
+					<span th:text="${row.value}"></span>
+				</div>
+			</div>
+		</li>
+	</ul>
+	<p>
+		<a href="/">
+			<span>Home</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>

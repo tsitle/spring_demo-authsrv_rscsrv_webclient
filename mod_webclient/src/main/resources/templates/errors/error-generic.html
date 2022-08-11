@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<h1>Web Client: Error</h1>
+	<h3>
+		<span th:text="${statusDesc}"></span> (<span th:text="${statusCode}"></span>)
+	</h3>
+	<p>
+		<a th:href="@{${linkUrl}}">
+			<span th:text="${linkDesc}"></span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>
