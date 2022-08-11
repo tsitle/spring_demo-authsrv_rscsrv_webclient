@@ -43,13 +43,13 @@ class WebUiController(
 		if (authentication.principal == null) {
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Authentication")
 		}
-		val outUsername = if (authentication.principal is DefaultOidcUser &&
+		val outUsername: String? = if (authentication.principal is DefaultOidcUser &&
 					(authentication.principal as DefaultOidcUser).idToken != null) {
 				(authentication.principal as DefaultOidcUser).idToken.fullName
 			} else {
 				authentication.principal.name
 			}
-		model["username"] = outUsername
+		model["username"] = outUsername ?: "n/a"
 		return "ui/root"
 	}
 
