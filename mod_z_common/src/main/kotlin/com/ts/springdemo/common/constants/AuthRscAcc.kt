@@ -37,8 +37,8 @@ class AuthRscAcc {
 			val res = mutableListOf<String>()
 			resourceAccessMap.forEach { (itRaUriId: String, itRaMethList: List<EnMeth>) ->
 					itRaMethList.forEach { itRaMeth: EnMeth ->
-							val rscSrv: EnSrv = rscIdSrvMap[itRaUriId] ?:
-									throw IllegalStateException("Resource ID '${itRaUriId}' not found")
+							val rscSrv: EnSrv = rscIdSrvMap[itRaUriId]
+									?: throw IllegalStateException("Resource ID '${itRaUriId}' not found")
 							val rule = buildRule(rscSrv, itRaUriId, itRaMeth)
 							if (! res.contains(rule)) {
 								res.add(rule)
