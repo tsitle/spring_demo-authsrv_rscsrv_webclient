@@ -23,8 +23,8 @@ class CustomUserDetailsService(
 
 	@Throws(UsernameNotFoundException::class)
 	override fun loadUserByUsername(email: String): UserDetails {
-		val user: CustomAuthUser = customAuthUserRepository.findByEmail(email) ?:
-				throw UsernameNotFoundException("No matching User found")
+		val user: CustomAuthUser = customAuthUserRepository.findByEmail(email)
+				?: throw UsernameNotFoundException("No matching User found")
 		return org.springframework.security.core.userdetails.User(
 				user.getEmail(),
 				user.getPassword(),

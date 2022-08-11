@@ -154,8 +154,8 @@ class SpringDemoAuthServerApplication(
 	private fun initCustomOidcUserInfos() {
 		customAppProperties.authServer.users.forEach {
 				val userEmail = it.value.email
-				val dbAuthUser: CustomAuthUser = customAuthUserRepository.findByEmail(userEmail) ?:
-						throw IllegalStateException("missing AuthUser '$userEmail'")
+				val dbAuthUser: CustomAuthUser = customAuthUserRepository.findByEmail(userEmail)
+						?: throw IllegalStateException("missing AuthUser '$userEmail'")
 				val dbExistingUserInfo: CustomOidcUserInfo? = customOidcUserInfoRepository.findByAuthUserId(dbAuthUser.getId())
 				//
 				println("OidcUserInfo for AuthUser: Email='$userEmail'")

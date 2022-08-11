@@ -69,12 +69,13 @@ class ApiCustomUserinfoController(
 	@Throws(ResponseStatusException::class)
 	private fun authorizeToken(oauth2Auth: OAuth2Authorization, requiredScope: String, orRole: Boolean) {
 		@Suppress("UNCHECKED_CAST")
-		val authorizedScopes: List<String> = (oauth2Auth.accessToken.claims?.get("scope") as Set<String>?)?.toList() ?: emptyList()
+		val authorizedScopes: List<String> = (oauth2Auth.accessToken.claims?.get("scope") as Set<String>?)?.toList()
+				?: emptyList()
 		var hasRole = false
 		if (orRole) {
 			val authorizedRoles: List<GrantedAuthority> =
-					(oauth2Auth.attributes["java.security.Principal"] as UsernamePasswordAuthenticationToken?)?.authorities?.toList() ?:
-					emptyList()
+					(oauth2Auth.attributes["java.security.Principal"] as UsernamePasswordAuthenticationToken?)?.authorities?.toList()
+					?: emptyList()
 			val requiredRoleAdmin = SimpleGrantedAuthority(
 					AuthRole.buildAuthRole(AuthRole.EnRoles.GRP_ADMIN)
 				)

@@ -23,7 +23,8 @@ class CustomAuthenticationProvider : AuthenticationProvider {
 	override fun authenticate(authentication: Authentication): Authentication {
 		val username = authentication.name
 		val password = authentication.credentials.toString()
-		val user: UserDetails = customUserDetailsService?.loadUserByUsername(username) ?: throw UsernameNotFoundException("No matching User found")
+		val user: UserDetails = customUserDetailsService?.loadUserByUsername(username)
+				?: throw UsernameNotFoundException("No matching User found")
 		if (! passwordEncoder!!.matches(password, user.password)) {
 			throw BadCredentialsException("Bad Credentials")
 		}

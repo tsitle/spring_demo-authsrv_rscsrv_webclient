@@ -35,10 +35,10 @@ class CustomOidcUserInfoService(
 	}
 
 	fun loadUserForIdToken(username: String?, authorizedScopes: Set<String>): OidcUserInfo? {
-		val authUser: CustomAuthUser = customAuthUserRepository.findByEmail(username) ?:
-				return null
-		val customOidcUserInfo: CustomOidcUserInfo = customOidcUserInfoRepository.findByAuthUserId(authUser.getId()) ?:
-				return null
+		val authUser: CustomAuthUser = customAuthUserRepository.findByEmail(username)
+				?: return null
+		val customOidcUserInfo: CustomOidcUserInfo = customOidcUserInfoRepository.findByAuthUserId(authUser.getId())
+				?: return null
 		val defaultOidcUserInfo: OidcUserInfo = convertCustomToDefaultOidcUserInfo(
 				authUser, customOidcUserInfo, authorizedScopes
 			)

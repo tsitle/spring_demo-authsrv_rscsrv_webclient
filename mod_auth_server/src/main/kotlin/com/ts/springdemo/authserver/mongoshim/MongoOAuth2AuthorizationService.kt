@@ -91,8 +91,8 @@ class MongoOAuth2AuthorizationService(
 			throw ResponseStatusException(BAD_REQUEST, "Invalid " + OAuth2AccessToken.TokenType.BEARER.value)
 		}
 
-		val oauth2Auth: OAuth2Authorization = findByToken(tokenVal, OAuth2TokenType.ACCESS_TOKEN) ?:
-				throw ResponseStatusException(BAD_REQUEST, "Invalid parameters")
+		val oauth2Auth: OAuth2Authorization = findByToken(tokenVal, OAuth2TokenType.ACCESS_TOKEN)
+				?: throw ResponseStatusException(BAD_REQUEST, "Invalid parameters")
 		if (oauth2Auth.accessToken.isExpired || oauth2Auth.accessToken.isBeforeUse || oauth2Auth.accessToken.isInvalidated ||
 				! oauth2Auth.accessToken.isActive) {
 			throw ResponseStatusException(BAD_REQUEST, "Invalid parameters")
@@ -133,7 +133,8 @@ class MongoOAuth2AuthorizationService(
 	}
 
 	private fun convertDefaultToCustomOAuth2Authorization(authorization: OAuth2Authorization): CustomOAuth2Authorization? {
-		val regClient: RegisteredClient = registeredClientRepository.findById(authorization.registeredClientId) ?: return null
+		val regClient: RegisteredClient = registeredClientRepository.findById(authorization.registeredClientId)
+				?: return null
 		val agtObj = authorization.authorizationGrantType
 		val tempEntry = CustomOAuth2Authorization.withRegisteredClient(regClient)
 				.id(authorization.id)
@@ -175,7 +176,8 @@ class MongoOAuth2AuthorizationService(
 	}
 
 	private fun convertCustomToDefaultOAuth2Authorization(custom: CustomOAuth2Authorization): OAuth2Authorization? {
-		val regClient: RegisteredClient = registeredClientRepository.findById(custom.getRegisteredClientId()) ?: return null
+		val regClient: RegisteredClient = registeredClientRepository.findById(custom.getRegisteredClientId())
+				?: return null
 		val agtObj = AuthorizationGrantType(custom.getAuthorizationGrantTypeStr())
 		val tempEntry = OAuth2Authorization.withRegisteredClient(regClient)
 				.id(custom.getId())
@@ -211,7 +213,8 @@ class MongoOAuth2AuthorizationService(
 		if (tokenValStr != null && metaStr != null) {
 			val metaMap = convertStrToObjMap(metaStr)
 			@Suppress("UNCHECKED_CAST")
-			val scopes: Set<String> = (metaMap["metadata.token.claims"] as Map<String, Any>?)?.get("scope") as Set<String>? ?: emptySet()
+			val scopes: Set<String> = (metaMap["metadata.token.claims"] as Map<String, Any>?)?.get("scope") as Set<String>?
+					?: emptySet()
 			val tokenObj = OAuth2AccessToken(
 					OAuth2AccessToken.TokenType.BEARER,
 					tokenValStr,

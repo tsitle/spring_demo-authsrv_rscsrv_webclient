@@ -31,8 +31,8 @@ class WebUiController(
 		if (authentication.principal == null) {
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Authentication")
 		}
-		val authUser: CustomAuthUser = customAuthUserRepository.findByEmail(authentication.principal as String?) ?:
-				throw ResponseStatusException(HttpStatus.BAD_REQUEST, "AuthUser not found")
+		val authUser: CustomAuthUser = customAuthUserRepository.findByEmail(authentication.principal as String?)
+				?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "AuthUser not found")
 		val oidcUserInfo: CustomOidcUserInfo? = customOidcUserInfoRepository.findByAuthUserId(authUser.getId())
 		val outUsername = oidcUserInfo?.getName() ?: authUser.getEmail()
 
