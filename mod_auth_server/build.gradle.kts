@@ -36,7 +36,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.security:spring-security-oauth2-authorization-server:0.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")  // required for /userinfo endpoint
-	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")  // for custom error pages
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")  // for HTML templates
 	compileOnly("org.projectlombok:lombok")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
