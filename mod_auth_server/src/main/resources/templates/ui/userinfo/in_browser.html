@@ -5,11 +5,11 @@
 	<div>
 		<ul>
 			<li>
-				<strong>Principal</strong>:
+				<strong>Principal:</strong>
 				<span th:text="${userinfo.principal}"></span>
 			</li>
 			<li>
-				<strong>Authorities</strong>:
+				<strong>Authorities:</strong>
 				<ul th:each="row : ${userinfo.authorities}">
 					<li>
 						<span th:text="${row}"></span>
