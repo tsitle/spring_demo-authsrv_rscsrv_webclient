@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
 import org.springframework.web.bind.annotation.PostMapping
@@ -31,12 +30,11 @@ class ApiCustomUserinfoController(
 
 	/** This endpoint can be reached with a Basic Authentication */
 	@PostMapping("/api/v1/userinfo/basicauth")
-	fun postUserinfoBasicAuth(authentication: UsernamePasswordAuthenticationToken): Map<String, String> {
+	fun postUserinfoBasicAuth(authentication: UsernamePasswordAuthenticationToken): Map<String, Any> {
 		if (authentication.principal == null) {
 			throw ResponseStatusException(BAD_REQUEST, "Missing Authentication")
 		}
-		val userDetails: UserDetails = getAuthUserDetails(authentication.principal as String?)
-		return getUserInfo(userDetails)
+		return getUserInfo(authentication.principal as String?, customUserDetailsService)
 	}
 
 	/**
@@ -45,10 +43,13 @@ class ApiCustomUserinfoController(
 	 * is allowed to access this endpoint.
 	 */
 	@PostMapping("/api/v1/userinfo/oauth")
-	fun postUserinfoOauth(@RequestHeader(HttpHeaders.AUTHORIZATION) hdAuth: String?, queryUserEmail: String?): Map<String, String> {
+	fun postUserinfoOauth(@RequestHeader(HttpHeaders.AUTHORIZATION) hdAuth: String?, queryUserEmail: String?): Map<String, Any> {
 		val oauth2Auth: OAuth2Authorization = (authorizationService as MongoOAuth2AuthorizationService).findByAuthorizationHeader(hdAuth)
+		// make sure the token has the required authorities
 		authorizeToken(
-				oauth2Auth, AuthScope.EnScopes.OPENID.value, orRole=false
+				oauth2Auth,
+				AuthScope.EnScopes.OPENID.value,
+				orRole=false
 			)
 		authorizeToken(
 				oauth2Auth,
@@ -59,20 +60,11 @@ class ApiCustomUserinfoController(
 			)
 
 		// now we can render the result
-		val userDetails: UserDetails = getAuthUserDetails(queryUserEmail)
-		return getUserInfo(userDetails)
+		return getUserInfo(queryUserEmail, customUserDetailsService)
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
-
-	@Throws(ResponseStatusException::class)
-	private fun getAuthUserDetails(userEmail: String?): UserDetails {
-		if (userEmail.isNullOrEmpty()) {
-			throw ResponseStatusException(BAD_REQUEST, "Missing Username")
-		}
-		return customUserDetailsService.loadUserByUsername(userEmail)
-	}
 
 	@Throws(ResponseStatusException::class)
 	private fun authorizeToken(oauth2Auth: OAuth2Authorization, requiredScope: String, orRole: Boolean) {
@@ -100,10 +92,20 @@ class ApiCustomUserinfoController(
 	// -----------------------------------------------------------------------------------------------------------------
 
 	companion object {
-		fun getUserInfo(userDetails: UserDetails): Map<String, String> {
-			val res = HashMap<String, String>()
+		@Throws(ResponseStatusException::class)
+		fun getUserInfo(userEmail: String?, customUserDetailsService: CustomUserDetailsService): Map<String, Any> {
+			if (userEmail.isNullOrEmpty()) {
+				throw ResponseStatusException(BAD_REQUEST, "Missing Username")
+			}
+			val userDetails = customUserDetailsService.loadUserByUsername(userEmail)
+			//
+			val res = HashMap<String, Any>()
 			res["principal"] = userDetails.username
-			res["authorities"] = userDetails.authorities.toString()
+			val authoritiesList = mutableListOf<String>()
+			userDetails.authorities.forEach {
+					authoritiesList.add(it.authority.toString())
+				}
+			res["authorities"] = authoritiesList
 			return res
 		}
 	}

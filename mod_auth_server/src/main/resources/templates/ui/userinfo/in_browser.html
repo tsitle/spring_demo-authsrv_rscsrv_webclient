@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<h1>Auth Server: User Info</h1>
+	<div>
+		<ul>
+			<li>
+				<strong>Principal</strong>:
+				<span th:text="${userinfo.principal}"></span>
+			</li>
+			<li>
+				<strong>Authorities</strong>:
+				<ul th:each="row : ${userinfo.authorities}">
+					<li>
+						<span th:text="${row}"></span>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<p>
+		<a href="/">
+			<span>Home</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>
