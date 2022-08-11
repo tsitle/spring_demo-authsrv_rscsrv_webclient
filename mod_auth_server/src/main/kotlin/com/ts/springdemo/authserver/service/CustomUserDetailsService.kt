@@ -28,10 +28,10 @@ class CustomUserDetailsService(
 		return org.springframework.security.core.userdetails.User(
 				user.getEmail(),
 				user.getPassword(),
-				user.getEnabled(),
-				true,
-				true,
-				true,
+				/*enabled:*/user.getEnabled(),
+				/*accountNonExpired:*/true,
+				/*credentialsNonExpired:*/true,
+				/*accountNonLocked:*/true,
 				getAuthorities(user)
 			)
 	}

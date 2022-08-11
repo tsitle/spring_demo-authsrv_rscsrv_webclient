@@ -2,7 +2,6 @@ package com.ts.springdemo.authserver.entity
 
 import com.ts.springdemo.common.constants.AuthRscAcc
 import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.security.oauth2.core.Version
 import org.springframework.util.Assert
 import java.io.Serializable
 
@@ -44,7 +43,7 @@ class RscIdPaths private constructor() : Serializable {
 
 
 	companion object {
-		private val serialVersionUID = Version.SERIAL_VERSION_UID
+		private const val serialVersionUID = "0.0.1"
 
 		fun withId(id: String): Builder {
 			Assert.hasText(id, "id cannot be empty")
@@ -57,7 +56,7 @@ class RscIdPaths private constructor() : Serializable {
 
 		class Builder : Serializable {
 			companion object {
-				private val serialVersionUID = Version.SERIAL_VERSION_UID
+				private const val serialVersionUID = "0.0.1"
 			}
 			private var id: String? = null
 			private var srv: AuthRscAcc.EnSrv = AuthRscAcc.EnSrv.NONE
