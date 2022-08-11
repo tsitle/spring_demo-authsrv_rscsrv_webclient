@@ -33,7 +33,8 @@ class SecurityConfig(
 		val roReg = AuthRole.buildAuthRole(AuthRole.EnRoles.GRP_REGULAR)
 		// StringBuilder() is only being used here to avoid IntelliJ's warning about a variable that cannot be resolved
 		val hasAuthForUiRoot: String = StringBuilder("hasRole('${roAdmin}') or ")
-				.append("hasRole('${roReg}')").toString()
+				.append("hasRole('${roReg}') or ")
+				.append("hasRole('ROLE_USER')").toString()  // ROLE_USER only means that the AuthUser has the openid scope
 
 		http
 				.authorizeRequests { authorizeRequestsCustomizer ->
