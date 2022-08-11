@@ -34,8 +34,8 @@ class ApiUserinfoController {
 	// -----------------------------------------------------------------------------------------------------------------
 
 	private fun getUserInfoFromAuthServer(userEmail: String): Map<String, Any> {
-		val authenticationPre = SecurityContextHolder.getContext().authentication ?:
-				throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "OAuth2 Login required")
+		val authenticationPre = SecurityContextHolder.getContext().authentication
+				?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "OAuth2 Login required")
 		if (authenticationPre is AnonymousAuthenticationToken) {
 			throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "OAuth2 Login required")
 		}
