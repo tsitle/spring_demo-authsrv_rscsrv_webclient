@@ -29,8 +29,8 @@ class ResourceServerConfig {
 				AuthRscAcc.EnSrv.RSC_SRV, "rs_custom_userinfo_api", AuthRscAcc.EnMeth.POST
 			)
 		// StringBuilder() is only being used here to avoid IntelliJ's warning about a variable that cannot be resolved
-		val hasAuthForArt: String = StringBuilder("hasRole('${roRscAccArticlesGet}')").toString()
-		val hasAuthForProd: String = StringBuilder("hasRole('${roRscAccProductsGet}')").toString()
+		val hasAuthForArt: String = StringBuilder("hasRole('${roAdmin}') or hasRole('${roRscAccArticlesGet}')").toString()
+		val hasAuthForProd: String = StringBuilder("hasRole('${roAdmin}') or hasRole('${roRscAccProductsGet}')").toString()
 		val hasAuthForUserinfo: String = StringBuilder("hasRole('${roAdmin}') or (")
 					.append("hasAuthority('${scOpenId}') and ")
 					.append("hasRole('${roRscAccUserinfoPost}')")
