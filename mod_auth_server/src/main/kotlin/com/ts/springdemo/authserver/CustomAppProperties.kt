@@ -50,6 +50,7 @@ data class CustomAppProperties(
 					var role: AuthRole.EnRoles,
 					var email: String,
 					var password: String,
+					var enabled: Boolean = true,
 					var oidcInfo: OidcInfo?,
 					var rolesResourceAccess: Map<String, ResourceAccessUriMethods>?
 				) {

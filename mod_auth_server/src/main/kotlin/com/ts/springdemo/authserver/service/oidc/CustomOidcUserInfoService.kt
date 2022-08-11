@@ -52,7 +52,11 @@ class CustomOidcUserInfoService(
 			} else {
 				null
 			}
-		val additionalClaims: Map<String, Any> = accessTokenEnhancingService.getAdditionalClaims(authUser, emptyList())
+		val additionalClaims: Map<String, Any> = if (authUser == null || ! authUser.getEnabled()) {
+				emptyMap()
+			} else {
+				accessTokenEnhancingService.getAdditionalClaims(authUser, emptyList())
+			}
 		return OidcUserInfo.builder()
 				.claims { remClaims ->
 						remClaims.putAll(jwtAuthenticationToken.token.claims)

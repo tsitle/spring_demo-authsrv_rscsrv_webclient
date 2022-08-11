@@ -141,7 +141,7 @@ class SpringDemoAuthServerApplication(
 					val dbNewUser = CustomAuthUser.withRandomId()
 							.email(userEmail)
 							.password(passwordEncoder.encode(it.value.password))
-							.enabled(true)
+							.enabled(it.value.enabled)
 							.role(userRole)
 							.resourceAccess(convRscAcc)
 							.build()

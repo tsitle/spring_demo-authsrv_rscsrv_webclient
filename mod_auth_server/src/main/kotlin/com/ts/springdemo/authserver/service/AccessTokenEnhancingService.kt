@@ -16,14 +16,14 @@ class AccessTokenEnhancingService(
 	fun getAdditionalClaims(authUser: CustomAuthUser?, clientScopes: List<String>): Map<String, Any> {
 		val res = HashMap<String, Any>()
 		val addRoles: MutableList<String> = mutableListOf()
-		if (authUser != null) {
+		if (authUser != null && authUser.getEnabled()) {
 			res[AuthRole.CLAIM_AUTHUSER_ROLE_KEY] = authUser.getRole().value.lowercase()
 			//
 			addRoles.addAll(
 					getAdditionalRolesForAuthUser(authUser)
 				)
 		}
-		if (clientScopes.isNotEmpty()) {
+		if ((authUser == null || authUser.getEnabled()) && clientScopes.isNotEmpty()) {
 			clientScopes.forEach { itScope: String ->
 					val lcScope = itScope.lowercase()
 					if (lcScope.startsWith(AuthRscAcc.RSCACC_RULE_PREFIX.lowercase()) &&
