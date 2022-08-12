@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+	<title>Web Client: Products</title>
+	<link rel="stylesheet" type="text/css" media="all" th:href="@{/default.css}" />
+</head>
 <body>
 	<h1>Web Client: Products</h1>
-	<ul th:each="row : ${dataArr}">
-		<li>
-			<span th:text="${row}"></span>
-		</li>
-	</ul>
+
+	<h3>Products:</h3>
+	<div th:each="row,iterStat : ${dataArr}" th:class="'rsc_product ' + (${iterStat.odd}? 'odd')">
+		<span th:text="|ID= ${row.id}|"></span><br />
+		<span th:text="|User= ${row.userId}|"></span><br />
+		<span th:text="|Desc= ${row.desc}|"></span><br />
+		<span th:text="|Price= ${row.price}|"></span>
+	</div>
+
 	<p>
 		<a href="/">
 			<span>Home</span>

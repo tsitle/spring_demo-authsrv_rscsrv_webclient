@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+	<title>Web Client: Articles</title>
+	<link rel="stylesheet" type="text/css" media="all" th:href="@{/default.css}" />
+</head>
 <body>
 	<h1>Web Client: Articles</h1>
-	<ul th:each="row : ${dataArr}">
-		<li>
-			<span th:text="${row}"></span>
-		</li>
-	</ul>
+
+	<h3>Articles:</h3>
+	<div th:each="row,iterStat : ${dataArr}" th:class="'rsc_article ' + (${iterStat.odd}? 'odd')">
+		<span th:text="|ID= ${row.id}|"></span><br />
+		<span th:text="|User= ${row.userId}|"></span><br />
+		<span>Lines:</span>
+		<ul th:each="line : ${row.lines}">
+			<li th:text="${line}"></li>
+		</ul>
+	</div>
+
 	<p>
 		<a href="/">
 			<span>Home</span>

@@ -1,8 +1,12 @@
 package com.ts.springdemo.oauthwebclient.ctrlweb
 
+import com.ts.springdemo.common.entity.ApiDataArticle
+import com.ts.springdemo.common.entity.ApiDataProduct
 import com.ts.springdemo.oauthwebclient.repository.CustomClientRegistrationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -56,7 +60,7 @@ class WebUiController(
 	@GetMapping(value = ["/ui/articles"])
 	fun getUiArticles(model: Model): String {
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/articles"
-		val dataArr: Array<String> = getStringArray(reqUrl)
+		val dataArr: Array<ApiDataArticle> = getDataArrayFromRscSrv(reqUrl)
 		model["dataArr"] = dataArr
 		return "ui/data/articles"
 	}
@@ -64,7 +68,7 @@ class WebUiController(
 	@GetMapping(value = ["/ui/products"])
 	fun getUiProducts(model: Model): String {
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/products"
-		val dataArr: Array<String> = getStringArray(reqUrl)
+		val dataArr: Array<ApiDataProduct> = getDataArrayFromRscSrv(reqUrl)
 		model["dataArr"] = dataArr
 		return "/ui/data/products"
 	}
@@ -145,73 +149,84 @@ class WebUiController(
 		return value?.toString() ?: "NULL"
 	}
 
+	private inline fun <reified T> typeReference() = object : ParameterizedTypeReference<Array<T>>() {}
+
 	@Throws(ClientAuthorizationException::class, ResponseStatusException::class)
-	private fun getStringArray(reqUrl: String): Array<String> {
+	private inline fun <reified T> getDataArrayFromRscSrv(reqUrl: String): Array<T> {
 		try {
-			val tmpRes: Array<String> = webClient
+			return webClient
 					.get()
 					.uri(reqUrl)
-					.attributes(clientRegistrationId(cfgClientWebAppInternalClientId))
+					.attributes(
+							clientRegistrationId(cfgClientWebAppInternalClientId)
+						)
 					.retrieve()
-					.bodyToMono(Array<String>::class.java)
+					.bodyToMono(
+							typeReference<T>()
+						)
 					.block()
 					?: throw ResponseStatusException(HttpStatus.NO_CONTENT, "No data received")
-
-			val res = mutableListOf<String>()
-			res.addAll(tmpRes.toList())
-			return res.toTypedArray()
 		} catch (err: WebClientResponseException.Unauthorized) {
-			return listOf(
-					"UnauthorizedException",
-					"method=GET",
-					"url=$reqUrl",
-					"status=" + err.rawStatusCode,
-					"body=" + err.responseBodyAsString,
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"UnauthorizedException, " +
+					"method=GET, " +
+					"url=$reqUrl, " +
+					"status=" + err.rawStatusCode + ", " +
+					"body=" + err.responseBodyAsString + ", " +
 					"error=" + err.message
-				).toTypedArray()
+				)
 		} catch (err: ClientAuthorizationException) {
 			if (err.error.errorCode == "client_authorization_required") {
+				// This usually happens when the OAuth2 Access Token has expired.
+				// The Web Client will then automatically fetch a new one.
 				throw err
 			}
-			return listOf(
-					"ClientAuthorizationException",
-					"method=GET",
-					"url=$reqUrl",
-					"error=" + err.message,
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"ClientAuthorizationException, " +
+					"method=GET, " +
+					"url=$reqUrl, " +
+					"error=" + err.message + ", " +
 					"errorCode=" + err.error.errorCode
-				).toTypedArray()
+				)
 		} catch (err: WebClientResponseException.Forbidden) {
 			val authentication: Authentication = SecurityContextHolder.getContext().authentication
-			return listOf(
-					"ForbiddenException",
-					"Auth Authorities=" + (if (authentication !is AnonymousAuthenticationToken) { authentication.authorities.toString() } else { "-" }),
-					"method=GET",
-					"url=$reqUrl",
-					"status=" + err.rawStatusCode,
-					"body=" + err.responseBodyAsString,
+			throw ResponseStatusException(HttpStatus.FORBIDDEN,
+					"ForbiddenException, " +
+					"Auth User=" + (if (authentication !is AnonymousAuthenticationToken) { (authentication.principal as DefaultOidcUser).name } else { "-" }) + ", " +
+					"Auth Authorities=" + (if (authentication !is AnonymousAuthenticationToken) { authentication.authorities.toString() } else { "-" }) + ", " +
+					"method=GET, " +
+					"url=$reqUrl, " +
+					"status=" + err.rawStatusCode + ", " +
+					"body=" + err.responseBodyAsString + ", " +
 					"error=" + err.message
-				).toTypedArray()
+				)
 		} catch (err: WebClientResponseException) {
-			return listOf(
-					"WebClientResponseException",
-					"method=GET",
-					"url=$reqUrl",
-					"status=" + err.rawStatusCode,
-					"body=" + err.responseBodyAsString,
+			throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"WebClientResponseException, " +
+					"method=GET, " +
+					"url=$reqUrl, " +
+					"status=" + err.rawStatusCode + ", " +
+					"body=" + err.responseBodyAsString + ", " +
 					"error=" + err.message
-				).toTypedArray()
+				)
 		} catch (err: WebClientException) {
-			return listOf(
-					"WebClientException",
-					"method=GET",
-					"url=$reqUrl",
+			throw ResponseStatusException(
+					HttpStatus.INTERNAL_SERVER_ERROR,
+					"WebClientException, " +
+							"method=GET, " +
+							"url=$reqUrl, " +
+							"error=" + err.message
+			)
+		} catch (err: DecodingException) {
+			throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"DecodingException, " +
 					"error=" + err.message
-				).toTypedArray()
+				)
 		} catch (err: IllegalArgumentException) {
-			return listOf(
-					"IllegalArgumentException",
+			throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+					"IllegalArgumentException, " +
 					"error=" + err.message
-				).toTypedArray()
+				)
 		}
 	}
 }

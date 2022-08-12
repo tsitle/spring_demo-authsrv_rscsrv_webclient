@@ -1,0 +1,15 @@
+div.rsc_article {
+	background-color: #e4e4e4;
+	padding: 10px;
+}
+div.rsc_article.odd {
+	background-color: #dfdfdf;
+}
+
+div.rsc_product {
+	background-color: #f8edff;
+	padding: 10px;
+}
+div.rsc_product.odd {
+	background-color: #edf0ff;
+}
