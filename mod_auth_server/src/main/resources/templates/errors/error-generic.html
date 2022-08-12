@@ -5,6 +5,10 @@
 	<h3>
 		<span th:text="${statusDesc}"></span> (<span th:text="${statusCode}"></span>)
 	</h3>
+	<div th:if="${errorMsg} ne ''">
+		<strong>Error Message:</strong>
+		<p th:text="${errorMsg}"></p>
+	</div>
 	<p>
 		<a th:href="@{${linkUrl}}">
 			<span th:text="${linkDesc}"></span>

@@ -36,6 +36,7 @@ data class CustomAppProperties(
 	data class AuthServer(
 				val providerIssuerUrl: String,
 				val enablePostmanCallback: Boolean = false,
+				val enableErrorMessagesInWebErrorController: Boolean = false,
 				val db: DbConf,
 				var users: Map<String, AuthUserConf>,
 				var oauth2Clients: Map<String, OAuth2ClientConf>
