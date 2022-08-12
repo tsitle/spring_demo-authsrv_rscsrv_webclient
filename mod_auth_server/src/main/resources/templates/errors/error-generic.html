@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+	<title th:text="|Auth Server: Error ${statusCode}|"></title>
+</head>
 <body>
 	<h1>Auth Server: Error</h1>
 	<h3>
 		<span th:text="${statusDesc}"></span> (<span th:text="${statusCode}"></span>)
 	</h3>
-	<div th:if="${errorMsg} ne ''">
+	<div th:if="${errorMsg ne null and errorMsg ne ''}">
 		<strong>Error Message:</strong>
 		<p th:text="${errorMsg}"></p>
 	</div>
