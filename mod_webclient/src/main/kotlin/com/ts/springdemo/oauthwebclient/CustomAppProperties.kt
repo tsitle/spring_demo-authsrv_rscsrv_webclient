@@ -28,6 +28,7 @@ data class CustomAppProperties(
 	data class ResourceServer(val url: String)
 
 	data class ClientWebApp(
+				val enableErrorMessagesInWebErrorController: Boolean = false,
 				val internalClientId: String,
 				val url: String,
 				var oauth2Clients: Map<String, OAuth2ClientConf> = HashMap()
