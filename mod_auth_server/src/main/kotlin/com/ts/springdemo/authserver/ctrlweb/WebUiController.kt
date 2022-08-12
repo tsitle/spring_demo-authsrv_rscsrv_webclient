@@ -5,7 +5,7 @@ import com.ts.springdemo.authserver.entity.CustomAuthUser
 import com.ts.springdemo.authserver.entity.oidc.CustomOidcUserInfo
 import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
 import com.ts.springdemo.authserver.repository.oidc.CustomOidcUserInfoRepository
-import com.ts.springdemo.authserver.service.CustomUserDetailsService
+import com.ts.springdemo.authserver.service.CustomAuthUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -23,7 +23,7 @@ class WebUiController(
 			@Autowired
 			private val customOidcUserInfoRepository: CustomOidcUserInfoRepository,
 			@Autowired
-			private val customUserDetailsService: CustomUserDetailsService,
+			private val customAuthUserService: CustomAuthUserService,
 		) {
 
 	@GetMapping("/")
@@ -47,7 +47,7 @@ class WebUiController(
 		}
 		val apiUserInfo: Map<String, Any> = ApiCustomUserinfoController.getUserInfo(
 				authentication.principal as String?,
-				customUserDetailsService
+				customAuthUserService
 			)
 		model["userinfo"] = apiUserInfo
 		return "ui/userinfo/in_browser"

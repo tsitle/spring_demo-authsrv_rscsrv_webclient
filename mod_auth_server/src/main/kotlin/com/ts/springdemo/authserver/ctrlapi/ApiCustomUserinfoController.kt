@@ -1,7 +1,7 @@
 package com.ts.springdemo.authserver.ctrlapi
 
 import com.ts.springdemo.authserver.mongoshim.MongoOAuth2AuthorizationService
-import com.ts.springdemo.authserver.service.CustomUserDetailsService
+import com.ts.springdemo.authserver.service.CustomAuthUserService
 import com.ts.springdemo.common.constants.AuthRole
 import com.ts.springdemo.common.constants.AuthRscAcc
 import com.ts.springdemo.common.constants.AuthScope
@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException
 @RestController
 class ApiCustomUserinfoController(
 			@Autowired
-			private val customUserDetailsService: CustomUserDetailsService,
+			private val customAuthUserService: CustomAuthUserService,
 			@Autowired
 			private val authorizationService: OAuth2AuthorizationService
 		) {
@@ -34,7 +34,7 @@ class ApiCustomUserinfoController(
 		if (authentication.principal == null) {
 			throw ResponseStatusException(BAD_REQUEST, "Missing Authentication")
 		}
-		return getUserInfo(authentication.principal as String?, customUserDetailsService)
+		return getUserInfo(authentication.principal as String?, customAuthUserService)
 	}
 
 	/**
@@ -60,7 +60,7 @@ class ApiCustomUserinfoController(
 			)
 
 		// now we can render the result
-		return getUserInfo(queryUserEmail, customUserDetailsService)
+		return getUserInfo(queryUserEmail, customAuthUserService)
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -94,11 +94,11 @@ class ApiCustomUserinfoController(
 
 	companion object {
 		@Throws(ResponseStatusException::class)
-		fun getUserInfo(userEmail: String?, customUserDetailsService: CustomUserDetailsService): Map<String, Any> {
+		fun getUserInfo(userEmail: String?, customAuthUserService: CustomAuthUserService): Map<String, Any> {
 			if (userEmail.isNullOrEmpty()) {
 				throw ResponseStatusException(BAD_REQUEST, "Missing Username")
 			}
-			val userDetails = customUserDetailsService.loadUserByUsername(userEmail)
+			val userDetails = customAuthUserService.loadUserByUsername(userEmail)
 			//
 			val res = HashMap<String, Any>()
 			res["principal"] = userDetails.username

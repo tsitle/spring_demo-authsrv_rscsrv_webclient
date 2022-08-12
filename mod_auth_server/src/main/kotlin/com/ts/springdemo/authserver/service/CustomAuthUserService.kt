@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class CustomUserDetailsService(
+class CustomAuthUserService(
 			@Autowired
 			private val customAuthUserRepository: CustomAuthUserRepository,
 			@Autowired
