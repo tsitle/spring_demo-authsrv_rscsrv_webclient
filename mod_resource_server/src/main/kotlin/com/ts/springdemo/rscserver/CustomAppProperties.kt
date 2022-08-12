@@ -15,8 +15,34 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 @ConfigurationProperties("custom-app")
 data class CustomAppProperties(
-			val authServer: AuthServer
+			val authServer: AuthServer,
+			var resourceServer: ResourceServer
 		) {
 
-	data class AuthServer(val providerIssuerUrl: String = "")
+	data class AuthServer(
+				val providerIssuerUrl: String = ""
+			)
+
+	data class ResourceServer(
+				val db: DbConf,
+				val dataArticlesAp: Map<String, DataArticle>,
+				val dataProductsAp: Map<String, DataProduct>
+			) {
+
+		data class DbConf(
+					val pruneCollections: Boolean = false,
+					val initCollections: Boolean = true
+				)
+
+		data class DataArticle(
+					var userId: String,
+					val lines: List<String>
+				)
+
+		data class DataProduct(
+					var userId: String,
+					var desc: String?,
+					var price: Double?
+				)
+	}
 }
