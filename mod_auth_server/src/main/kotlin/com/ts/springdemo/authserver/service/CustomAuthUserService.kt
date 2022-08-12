@@ -21,9 +21,37 @@ class CustomAuthUserService(
 			private val rscIdPathsService: RscIdPathsService
 		) : UserDetailsService {
 
+	fun findByUserEmail(userEmail: String?): CustomAuthUser? {
+		if (userEmail.isNullOrEmpty()) {
+			return null
+		}
+		return customAuthUserRepository.findByEmail(
+				userEmail.lowercase().trim()
+			)
+	}
+
+	fun save(authUser: CustomAuthUser) {
+		val emailAsIs = authUser.getEmail()
+		val emailLc = emailAsIs.lowercase().trim()
+		if (emailLc != emailAsIs) {
+			val tmpAuthUser = CustomAuthUser.from(authUser)
+					.email(emailLc)
+					.build()
+			customAuthUserRepository.save(tmpAuthUser)
+		} else {
+			customAuthUserRepository.save(authUser)
+		}
+	}
+
+	fun deleteAll() {
+		customAuthUserRepository.deleteAll()
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+
 	@Throws(UsernameNotFoundException::class)
 	override fun loadUserByUsername(email: String): UserDetails {
-		val user: CustomAuthUser = customAuthUserRepository.findByEmail(email)
+		val user: CustomAuthUser = this.findByUserEmail(email)
 				?: throw UsernameNotFoundException("No matching User found")
 		return org.springframework.security.core.userdetails.User(
 				user.getEmail(),

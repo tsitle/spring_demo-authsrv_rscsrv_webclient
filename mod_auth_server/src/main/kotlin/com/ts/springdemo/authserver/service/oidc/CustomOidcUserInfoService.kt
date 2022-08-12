@@ -3,9 +3,9 @@ package com.ts.springdemo.authserver.service.oidc
 import com.ts.springdemo.common.constants.AuthScope
 import com.ts.springdemo.authserver.entity.CustomAuthUser
 import com.ts.springdemo.authserver.entity.oidc.CustomOidcUserInfo
-import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
 import com.ts.springdemo.authserver.repository.oidc.CustomOidcUserInfoRepository
 import com.ts.springdemo.authserver.service.AccessTokenEnhancingService
+import com.ts.springdemo.authserver.service.CustomAuthUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.oidc.DefaultAddressStandardClaim
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 @Service
 class CustomOidcUserInfoService(
 			@Autowired
-			private val customAuthUserRepository: CustomAuthUserRepository,
+			private val customAuthUserService: CustomAuthUserService,
 			@Autowired
 			private val customOidcUserInfoRepository: CustomOidcUserInfoRepository,
 			@Autowired
@@ -35,7 +35,7 @@ class CustomOidcUserInfoService(
 	}
 
 	fun loadUserForIdToken(username: String?, authorizedScopes: Set<String>): OidcUserInfo? {
-		val authUser: CustomAuthUser = customAuthUserRepository.findByEmail(username)
+		val authUser: CustomAuthUser = customAuthUserService.findByUserEmail(username)
 				?: return null
 		val customOidcUserInfo: CustomOidcUserInfo = customOidcUserInfoRepository.findByAuthUserId(authUser.getId())
 				?: return null
@@ -48,7 +48,7 @@ class CustomOidcUserInfoService(
 	fun getMappedPrincipalClaimsForUserInfoInJwtAuthToken(jwtAuthenticationToken: JwtAuthenticationToken): OidcUserInfo {
 		val username: String? = jwtAuthenticationToken.name
 		val authUser: CustomAuthUser? = if (! username.isNullOrEmpty()) {
-				customAuthUserRepository.findByEmail(username)
+				customAuthUserService.findByUserEmail(username)
 			} else {
 				null
 			}

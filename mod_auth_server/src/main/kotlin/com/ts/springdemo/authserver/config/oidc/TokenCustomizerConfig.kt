@@ -1,8 +1,8 @@
 package com.ts.springdemo.authserver.config.oidc
 
 import com.ts.springdemo.authserver.entity.CustomAuthUser
-import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
 import com.ts.springdemo.authserver.service.AccessTokenEnhancingService
+import com.ts.springdemo.authserver.service.CustomAuthUserService
 import com.ts.springdemo.authserver.service.oidc.CustomOidcUserInfoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 @Configuration
 class TokenCustomizerConfig(
 			@Autowired
-			private val customAuthUserRepository: CustomAuthUserRepository
+			private val customAuthUserService: CustomAuthUserService
 		) {
 
 	@Bean
@@ -40,7 +40,7 @@ class TokenCustomizerConfig(
 				} else if (OAuth2TokenType.ACCESS_TOKEN == context.tokenType) {
 					val username: String? = context.getPrincipal<Authentication>().name
 					val authUser: CustomAuthUser? = if (! username.isNullOrEmpty()) {
-							customAuthUserRepository.findByEmail(username)
+							customAuthUserService.findByUserEmail(username)
 						} else {
 							null
 						}

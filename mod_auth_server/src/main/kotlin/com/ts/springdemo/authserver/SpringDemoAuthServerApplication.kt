@@ -7,10 +7,10 @@ import com.ts.springdemo.authserver.entity.CustomAuthUser
 import com.ts.springdemo.authserver.entity.RscIdPaths
 import com.ts.springdemo.authserver.entity.oidc.CustomOidcUserInfo
 import com.ts.springdemo.authserver.mongoshim.MongoRegisteredClientRepository
-import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
 import com.ts.springdemo.authserver.repository.CustomOAuth2AuthorizationRepository
 import com.ts.springdemo.authserver.repository.RscIdPathsRepository
 import com.ts.springdemo.authserver.repository.oidc.CustomOidcUserInfoRepository
+import com.ts.springdemo.authserver.service.CustomAuthUserService
 import com.ts.springdemo.authserver.service.RscIdPathsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -38,7 +38,7 @@ class SpringDemoAuthServerApplication(
 			@Autowired
 			private val passwordEncoder: PasswordEncoder,
 			@Autowired
-			private val customAuthUserRepository: CustomAuthUserRepository,
+			private val customAuthUserService: CustomAuthUserService,
 			@Autowired
 			private val registeredClientRepository: RegisteredClientRepository,
 			@Autowired
@@ -51,13 +51,13 @@ class SpringDemoAuthServerApplication(
 			private val mongoTemplate: MongoTemplate,
 			@Autowired
 			private val customOAuth2AuthorizationRepository: CustomOAuth2AuthorizationRepository
-) {
+		) {
 
 	@Bean
 	fun init(): CommandLineRunner? {
 		return CommandLineRunner {
 				// bogus operation for initializing the DB connection
-				customAuthUserRepository.findByEmail("does.not@exist")
+				customAuthUserService.findByUserEmail("does.not@exist")
 				//
 				println("----------------------------------------")
 				println("----------------------------------------")
@@ -96,7 +96,7 @@ class SpringDemoAuthServerApplication(
 		println("  - rscIdPaths")
 		rscIdPathsRepository.deleteAll()
 		println("  - authUser")
-		customAuthUserRepository.deleteAll()
+		customAuthUserService.deleteAll()
 		println("  - oidcUserInfo")
 		customOidcUserInfoRepository.deleteAll()
 		println("  - customOauth2Authorization")
@@ -130,7 +130,7 @@ class SpringDemoAuthServerApplication(
 		customAppProperties.authServer.users.forEach {
 				val userEmail = it.value.email
 				val userRole = it.value.role
-				val dbExistingUser: CustomAuthUser? = customAuthUserRepository.findByEmail(userEmail)
+				val dbExistingUser: CustomAuthUser? = customAuthUserService.findByUserEmail(userEmail)
 				//
 				println("AuthUser: Email='$userEmail', Role='" + userRole.value + "'")
 				//
@@ -145,7 +145,7 @@ class SpringDemoAuthServerApplication(
 							.role(userRole)
 							.resourceAccess(convRscAcc)
 							.build()
-					customAuthUserRepository.save(dbNewUser)
+					customAuthUserService.save(dbNewUser)
 				}
 			}
 	}
@@ -154,7 +154,7 @@ class SpringDemoAuthServerApplication(
 	private fun initCustomOidcUserInfos() {
 		customAppProperties.authServer.users.forEach {
 				val userEmail = it.value.email
-				val dbAuthUser: CustomAuthUser = customAuthUserRepository.findByEmail(userEmail)
+				val dbAuthUser: CustomAuthUser = customAuthUserService.findByUserEmail(userEmail)
 						?: throw IllegalStateException("missing AuthUser '$userEmail'")
 				val dbExistingUserInfo: CustomOidcUserInfo? = customOidcUserInfoRepository.findByAuthUserId(dbAuthUser.getId())
 				//
@@ -166,7 +166,7 @@ class SpringDemoAuthServerApplication(
 					val dbUserInfoBuilder = CustomOidcUserInfo.withRandomId()
 					dbUserInfoBuilder.authUserId(dbAuthUser.getId())
 					dbUserInfoBuilder.updatedAt(Instant.now())
-					it.value.oidcInfo?.let { itOidc ->
+					it.value.oidcInfo.let { itOidc ->
 							dbUserInfoBuilder.familyName(itOidc.familyName)
 							dbUserInfoBuilder.givenName(itOidc.givenName)
 							dbUserInfoBuilder.middleName(itOidc.middleName)

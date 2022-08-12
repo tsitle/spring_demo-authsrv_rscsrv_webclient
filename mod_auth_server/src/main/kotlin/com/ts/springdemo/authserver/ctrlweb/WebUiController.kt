@@ -3,7 +3,6 @@ package com.ts.springdemo.authserver.ctrlweb
 import com.ts.springdemo.authserver.ctrlapi.ApiCustomUserinfoController
 import com.ts.springdemo.authserver.entity.CustomAuthUser
 import com.ts.springdemo.authserver.entity.oidc.CustomOidcUserInfo
-import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
 import com.ts.springdemo.authserver.repository.oidc.CustomOidcUserInfoRepository
 import com.ts.springdemo.authserver.service.CustomAuthUserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,11 +18,9 @@ import org.springframework.web.server.ResponseStatusException
 @Controller
 class WebUiController(
 			@Autowired
-			private val customAuthUserRepository: CustomAuthUserRepository,
-			@Autowired
 			private val customOidcUserInfoRepository: CustomOidcUserInfoRepository,
 			@Autowired
-			private val customAuthUserService: CustomAuthUserService,
+			private val customAuthUserService: CustomAuthUserService
 		) {
 
 	@GetMapping("/")
@@ -31,7 +28,7 @@ class WebUiController(
 		if (authentication.principal == null) {
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing Authentication")
 		}
-		val authUser: CustomAuthUser = customAuthUserRepository.findByEmail(authentication.principal as String?)
+		val authUser: CustomAuthUser = customAuthUserService.findByUserEmail(authentication.principal as String?)
 				?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "AuthUser not found")
 		val oidcUserInfo: CustomOidcUserInfo? = customOidcUserInfoRepository.findByAuthUserId(authUser.getId())
 		val outUsername = oidcUserInfo?.getName() ?: authUser.getEmail()
