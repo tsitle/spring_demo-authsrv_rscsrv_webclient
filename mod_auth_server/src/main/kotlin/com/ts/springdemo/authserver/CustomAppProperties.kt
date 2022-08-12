@@ -51,15 +51,15 @@ data class CustomAppProperties(
 					var email: String,
 					var password: String,
 					var enabled: Boolean = true,
-					var oidcInfo: OidcInfo?,
+					var oidcInfo: OidcInfo,
 					var rolesResourceAccess: Map<String, ResourceAccessUriMethods>?
 				) {
 
 			data class OidcInfo(
 						/** The user's family name */
-						var familyName: String? = null,
+						var familyName: String,
 						/** The user's first name */
-						var givenName: String? = null,
+						var givenName: String,
 						/** The user's middle name */
 						var middleName: String? = null,
 						/** The user's nickname */
