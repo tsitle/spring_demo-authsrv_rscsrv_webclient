@@ -1,4 +1,4 @@
-package com.ts.springdemo.authserver.config
+package com.ts.springdemo.authserver.config.misc
 
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint

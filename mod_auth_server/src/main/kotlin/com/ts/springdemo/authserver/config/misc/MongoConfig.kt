@@ -1,4 +1,4 @@
-package com.ts.springdemo.authserver.config
+package com.ts.springdemo.authserver.config.misc
 
 import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClient

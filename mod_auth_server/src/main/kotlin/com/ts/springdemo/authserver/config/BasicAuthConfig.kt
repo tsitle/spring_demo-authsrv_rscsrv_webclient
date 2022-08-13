@@ -1,5 +1,6 @@
 package com.ts.springdemo.authserver.config
 
+import com.ts.springdemo.authserver.config.misc.CustomBasicAuthEntryPoint
 import com.ts.springdemo.common.constants.AuthRole
 import com.ts.springdemo.common.constants.AuthRscAcc
 import org.springframework.beans.factory.annotation.Autowired
