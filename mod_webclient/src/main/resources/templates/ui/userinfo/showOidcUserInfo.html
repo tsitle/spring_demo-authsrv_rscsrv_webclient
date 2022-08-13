@@ -7,14 +7,15 @@
 	<h1>Web Client: OIDC User Info</h1>
 	<ul th:each="row : ${authInfoArr}">
 		<li th:if="${row.value} ne 'NULL'">
-			<strong th:text="${row.key} + ':'"></strong>
 			<div th:switch="${row.key}">
 				<div th:case="'Auth Authorities'">
+					<strong th:text="${row.key} + ':'"></strong>
 					<ul th:each="rowAuth : ${row.value}">
 						<li th:text="${rowAuth}"></li>
 					</ul>
 				</div>
 				<div th:case="*">
+					<strong th:text="${row.key} + ':'"></strong>
 					<span th:text="${row.value}"></span>
 				</div>
 			</div>
