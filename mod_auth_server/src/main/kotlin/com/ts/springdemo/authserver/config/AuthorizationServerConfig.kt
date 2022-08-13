@@ -10,7 +10,6 @@ import com.ts.springdemo.authserver.mongoshim.MongoOAuth2AuthorizationService
 import com.ts.springdemo.authserver.mongoshim.MongoRegisteredClientRepository
 import com.ts.springdemo.authserver.repository.CustomOAuth2AuthorizationRepository
 import com.ts.springdemo.authserver.repository.JwkRsaKeyRepository
-import com.ts.springdemo.authserver.service.EncryptionService
 import com.ts.springdemo.authserver.service.oidc.CustomOidcUserInfoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -47,9 +46,7 @@ class AuthorizationServerConfig(
 			@Autowired
 			private val customOidcUserInfoService: CustomOidcUserInfoService,
 			@Autowired
-			private val jwkRsaKeyRepository: JwkRsaKeyRepository,
-			@Autowired
-			private val encryptionService: EncryptionService
+			private val jwkRsaKeyRepository: JwkRsaKeyRepository
 		) {
 
 	@Value("\${custom-app.auth-server.provider-issuer-url}")
@@ -147,7 +144,7 @@ class AuthorizationServerConfig(
 					throw IllegalStateException("DB error when fetching DbJwkRsaKey")
 				}
 				try {
-					return dbJwkRsaKey.get().getRsaKey(encryptionService, cfgJwkRsaKeyPw)
+					return dbJwkRsaKey.get().getRsaKey(cfgJwkRsaKeyPw)
 				} catch (err: BadPaddingException) {
 					// most likely the password has changed. so we'll simply generate a new RSA Key Pair
 				}
@@ -163,7 +160,7 @@ class AuthorizationServerConfig(
 				.build()
 		// store Key Pair in DB
 		if (cfgJwkRsaKeyStoreInDb) {
-			val dbJwkRsaKey = DbJwkRsaKey.from(encryptionService, cfgJwkRsaKeyPw, "default", rsaKey).build()
+			val dbJwkRsaKey = DbJwkRsaKey.from(cfgJwkRsaKeyPw, "default", rsaKey).build()
 			jwkRsaKeyRepository.save(dbJwkRsaKey)
 		}
 		//

@@ -22,17 +22,17 @@ class DbJwkRsaKey private constructor() : Serializable {
 		return id
 	}
 
-	fun getRsaKey(encryptionService: EncryptionService, pw: String): RSAKey {
+	fun getRsaKey(pw: String): RSAKey {
 		Assert.hasText(pw, "pw cannot be empty")
 		Assert.hasText(checksum, "checksum cannot be empty")
 
 		val plainRsaPriv: MutableMap<String, String> = mutableMapOf()
 		encrRsaPriv.forEach { (itKey: String, itVal: String) ->
 				Assert.hasText(itVal, "EncrRsaPriv '$itKey' cannot be empty")
-				plainRsaPriv[itKey] = decryptField(encryptionService, pw, itVal)
+				plainRsaPriv[itKey] = decryptField(pw, itVal)
 			}
 
-		val checksumExp = decryptField(encryptionService, pw, checksum)
+		val checksumExp = decryptField(pw, checksum)
 		val checksumIs = getChecksumForRsaFields(plainRsaPub, plainRsaPriv)
 		if (checksumIs != checksumExp) {
 			throw IllegalStateException("checksum of DbJwkRsaKey ID '$id' does not match")
@@ -68,8 +68,8 @@ class DbJwkRsaKey private constructor() : Serializable {
 	companion object {
 		private const val serialVersionUID = "0.0.1"
 
-		private fun decryptField(encryptionService: EncryptionService, pw: String, data: String): String {
-			return encryptionService.decrypt(data, pw)
+		private fun decryptField(pw: String, data: String): String {
+			return EncryptionService.decrypt(data, pw)
 		}
 
 		private fun getChecksumForRsaFields(plainRsaPub: Map<String, String?>, plainRsaPriv: Map<String, String?>): String {
@@ -87,25 +87,23 @@ class DbJwkRsaKey private constructor() : Serializable {
 				)
 		}
 
-		fun withId(encryptionService: EncryptionService, pw: String, id: String): Builder {
+		fun withId(pw: String, id: String): Builder {
 			Assert.hasText(id, "id cannot be empty")
-			return Builder(encryptionService, pw, id)
+			return Builder(pw, id)
 		}
 
 		fun from(dbJwkRsaKey: DbJwkRsaKey): Builder {
 			return Builder(dbJwkRsaKey)
 		}
 
-		fun from(encryptionService: EncryptionService, pw: String, id: String, jwkRsaKey: RSAKey): Builder {
-			return Builder(encryptionService, pw, id, jwkRsaKey)
+		fun from(pw: String, id: String, jwkRsaKey: RSAKey): Builder {
+			return Builder(pw, id, jwkRsaKey)
 		}
 
 		class Builder : Serializable {
 			companion object {
 				private const val serialVersionUID = "0.0.1"
 			}
-
-			private var encryptionService: EncryptionService? = null
 
 			private var id: String? = null
 			private var password: String? = null
@@ -114,8 +112,7 @@ class DbJwkRsaKey private constructor() : Serializable {
 			private val rsaPub: MutableMap<String, String?> = mutableMapOf()
 			private val rsaPriv: MutableMap<String, String?> = mutableMapOf()
 
-			constructor(encryptionService: EncryptionService, pw: String, id: String) {
-				this.encryptionService = encryptionService
+			constructor(pw: String, id: String) {
 				this.id = id
 				this.password = pw
 			}
@@ -132,8 +129,7 @@ class DbJwkRsaKey private constructor() : Serializable {
 					}
 			}
 
-			constructor(encryptionService: EncryptionService, pw: String, id: String, jwkRsaKey: RSAKey) {
-				this.encryptionService = encryptionService
+			constructor(pw: String, id: String, jwkRsaKey: RSAKey) {
 				this.id = id
 				this.password = pw
 
@@ -222,7 +218,6 @@ class DbJwkRsaKey private constructor() : Serializable {
 				Assert.hasText(id, "id cannot be empty")
 				if (password != null) {
 					Assert.hasText(id, "password cannot be empty if password != null")
-					Assert.notNull(encryptionService, "encryptionService cannot be null if password != null")
 				}
 
 				rsaPub.forEach { (itKey, itVal: String?) ->
@@ -260,7 +255,7 @@ class DbJwkRsaKey private constructor() : Serializable {
 				if (password == null) {
 					return data
 				}
-				return encryptionService!!.encrypt(data, password!!)
+				return EncryptionService.encrypt(data, password!!)
 			}
 		}
 	}

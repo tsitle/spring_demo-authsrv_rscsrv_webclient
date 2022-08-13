@@ -11,7 +11,6 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 
-@Service
 class EncryptionService {
 
 	companion object {
@@ -73,53 +72,53 @@ class EncryptionService {
 			return getDigest(dataByArr, "SHA256")
 		}
 
+		fun encrypt(input: String, password: String): String {
+			Assert.hasText(password, "password cannot be empty")
+
+			val pbkData: Map<String, Any> = getPasswordBasedKey(null, password)
+			val key: SecretKey = pbkData["secretKey"] as SecretKey
+			val ivByArr = getRandomBytes(16)
+			val ivParameterSpec = IvParameterSpec(ivByArr)
+			val cipher: Cipher = Cipher.getInstance(CIPHER_ALGO)
+			cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec)
+			val cipherText: ByteArray = cipher.doFinal(input.toByteArray())
+			return Base64.encode(ivByArr).toString() + B64_IV_DELIMITER +
+					(pbkData["pwSalt"] as String) + B64_SALT_DELIMITER +
+					Base64.encode(cipherText).toString()
+		}
+
+		@Throws(IllegalStateException::class)
+		fun decrypt(cipherTextWithIvAndSalt: String, password: String): String {
+			Assert.hasText(password, "password cannot be empty")
+
+			val splitOneArr = cipherTextWithIvAndSalt.split(B64_IV_DELIMITER)
+			if (splitOneArr.size != 2) {
+				throw IllegalStateException("invalid ciphertext")
+			}
+			val ivByArr: ByteArray = Base64(splitOneArr[0]).decode()
+
+			val splitTwoArr = splitOneArr[1].split(B64_SALT_DELIMITER)
+			if (splitTwoArr.size != 2) {
+				throw IllegalStateException("invalid ciphertext")
+			}
+			val cipherSalt = splitTwoArr[0]
+			val cipherText = splitTwoArr[1]
+
+			val pbkData: Map<String, Any> = getPasswordBasedKey(cipherSalt, password)
+			val key: SecretKey = pbkData["secretKey"] as SecretKey
+			val ivParameterSpec = IvParameterSpec(ivByArr)
+			val cipher = Cipher.getInstance(CIPHER_ALGO)
+			cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec)
+			val plainText = cipher.doFinal(
+					Base64.from(cipherText).decode()
+				)
+			return String(plainText)
+		}
+
 		private fun getDigest(dataByArr: ByteArray, algo: String): String {
 			val md: MessageDigest = MessageDigest.getInstance(algo)
 			md.update(dataByArr)
 			return md.digest().toHex()
 		}
-	}
-
-	fun encrypt(input: String, password: String): String {
-		Assert.hasText(password, "password cannot be empty")
-
-		val pbkData: Map<String, Any> = getPasswordBasedKey(null, password)
-		val key: SecretKey = pbkData["secretKey"] as SecretKey
-		val ivByArr = getRandomBytes(16)
-		val ivParameterSpec = IvParameterSpec(ivByArr)
-		val cipher: Cipher = Cipher.getInstance(CIPHER_ALGO)
-		cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec)
-		val cipherText: ByteArray = cipher.doFinal(input.toByteArray())
-		return Base64.encode(ivByArr).toString() + B64_IV_DELIMITER +
-				(pbkData["pwSalt"] as String) + B64_SALT_DELIMITER +
-				Base64.encode(cipherText).toString()
-	}
-
-	@Throws(IllegalStateException::class)
-	fun decrypt(cipherTextWithIvAndSalt: String, password: String): String {
-		Assert.hasText(password, "password cannot be empty")
-
-		val splitOneArr = cipherTextWithIvAndSalt.split(B64_IV_DELIMITER)
-		if (splitOneArr.size != 2) {
-			throw IllegalStateException("invalid ciphertext")
-		}
-		val ivByArr: ByteArray = Base64(splitOneArr[0]).decode()
-
-		val splitTwoArr = splitOneArr[1].split(B64_SALT_DELIMITER)
-		if (splitTwoArr.size != 2) {
-			throw IllegalStateException("invalid ciphertext")
-		}
-		val cipherSalt = splitTwoArr[0]
-		val cipherText = splitTwoArr[1]
-
-		val pbkData: Map<String, Any> = getPasswordBasedKey(cipherSalt, password)
-		val key: SecretKey = pbkData["secretKey"] as SecretKey
-		val ivParameterSpec = IvParameterSpec(ivByArr)
-		val cipher = Cipher.getInstance(CIPHER_ALGO)
-		cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec)
-		val plainText = cipher.doFinal(
-				Base64.from(cipherText).decode()
-			)
-		return String(plainText)
 	}
 }
