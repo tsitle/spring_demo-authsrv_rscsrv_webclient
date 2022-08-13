@@ -1,7 +1,6 @@
 package com.ts.springdemo.authserver.service
 
 import com.nimbusds.jose.util.Base64
-import org.springframework.stereotype.Service
 import org.springframework.util.Assert
 import java.security.MessageDigest
 import java.security.SecureRandom
@@ -26,31 +25,6 @@ class EncryptionService {
 		private const val CIPHER_ALGO = "AES/CBC/PKCS5Padding"
 		private const val B64_IV_DELIMITER = ";#IVEND#;"
 		private const val B64_SALT_DELIMITER = ";#SALTEND#;"
-
-		private fun getRandomBytes(len: Int): ByteArray {
-			val byArr = ByteArray(len)
-			val random = SecureRandom()
-			random.nextBytes(byArr)
-			return byArr
-		}
-
-		private fun getPasswordBasedKey(saltStr: String?, password: String): Map<String, Any> {
-			val res = mutableMapOf<String, Any>()
-			val saltByArr: ByteArray
-			if (saltStr == null) {
-				saltByArr = getRandomBytes(100)
-				res["pwSalt"] = Base64.encode(saltByArr).toString()
-			} else {
-				saltByArr = Base64(saltStr).decode()
-				res["pwSalt"] = "-"
-			}
-			val pbeKeySpec = PBEKeySpec(password.toCharArray(), saltByArr, 1000, KEY_SIZE)
-			val pbeKey = SecretKeyFactory.getInstance(KEY_FACTORY_ALGO).generateSecret(pbeKeySpec)
-			res["secretKey"] = SecretKeySpec(pbeKey.encoded, KEY_ALGO)
-			return res
-		}
-
-		private fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }.uppercase()
 
 		@Suppress("unused")
 		fun getMd5(dataStr: String): String {
@@ -114,6 +88,34 @@ class EncryptionService {
 				)
 			return String(plainText)
 		}
+
+		// -------------------------------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------------------------------
+
+		private fun getRandomBytes(len: Int): ByteArray {
+			val byArr = ByteArray(len)
+			val random = SecureRandom()
+			random.nextBytes(byArr)
+			return byArr
+		}
+
+		private fun getPasswordBasedKey(saltStr: String?, password: String): Map<String, Any> {
+			val res = mutableMapOf<String, Any>()
+			val saltByArr: ByteArray
+			if (saltStr == null) {
+				saltByArr = getRandomBytes(100)
+				res["pwSalt"] = Base64.encode(saltByArr).toString()
+			} else {
+				saltByArr = Base64(saltStr).decode()
+				res["pwSalt"] = "-"
+			}
+			val pbeKeySpec = PBEKeySpec(password.toCharArray(), saltByArr, 1000, KEY_SIZE)
+			val pbeKey = SecretKeyFactory.getInstance(KEY_FACTORY_ALGO).generateSecret(pbeKeySpec)
+			res["secretKey"] = SecretKeySpec(pbeKey.encoded, KEY_ALGO)
+			return res
+		}
+
+		private fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }.uppercase()
 
 		private fun getDigest(dataByArr: ByteArray, algo: String): String {
 			val md: MessageDigest = MessageDigest.getInstance(algo)
