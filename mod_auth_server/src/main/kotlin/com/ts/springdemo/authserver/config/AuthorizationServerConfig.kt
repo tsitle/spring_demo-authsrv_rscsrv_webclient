@@ -5,9 +5,12 @@ import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
+import com.ts.springdemo.authserver.entity.DbJwkRsaKey
 import com.ts.springdemo.authserver.mongoshim.MongoOAuth2AuthorizationService
 import com.ts.springdemo.authserver.mongoshim.MongoRegisteredClientRepository
 import com.ts.springdemo.authserver.repository.CustomOAuth2AuthorizationRepository
+import com.ts.springdemo.authserver.repository.JwkRsaKeyRepository
+import com.ts.springdemo.authserver.service.EncryptionService
 import com.ts.springdemo.authserver.service.oidc.CustomOidcUserInfoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -34,6 +37,7 @@ import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.util.*
+import javax.crypto.BadPaddingException
 
 
 @Configuration(proxyBeanMethods = false)
@@ -41,11 +45,19 @@ class AuthorizationServerConfig(
 			@Autowired
 			private val customOAuth2AuthorizationRepository: CustomOAuth2AuthorizationRepository,
 			@Autowired
-			private val customOidcUserInfoService: CustomOidcUserInfoService
+			private val customOidcUserInfoService: CustomOidcUserInfoService,
+			@Autowired
+			private val jwkRsaKeyRepository: JwkRsaKeyRepository,
+			@Autowired
+			private val encryptionService: EncryptionService
 		) {
 
 	@Value("\${custom-app.auth-server.provider-issuer-url}")
 	private val cfgProviderIssuerUrl: String = ""
+	@Value("\${custom-app.auth-server.jwk-rsa-key-conf.store-in-db}")
+	private val cfgJwkRsaKeyStoreInDb: Boolean = true
+	@Value("\${custom-app.auth-server.jwk-rsa-key-conf.password}")
+	private val cfgJwkRsaKeyPw: String = ""
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
@@ -100,7 +112,7 @@ class AuthorizationServerConfig(
 
 	@Bean
 	fun jwkSource(): JWKSource<SecurityContext?> {
-		val rsaKey: RSAKey = generateRsa()
+		val rsaKey: RSAKey = generateOrLoadJwkRsaKey()
 		val jwkSet = JWKSet(rsaKey)
 		return JWKSource<SecurityContext?> { jwkSelector: JWKSelector, _: SecurityContext? ->
 				jwkSelector.select(
@@ -124,14 +136,38 @@ class AuthorizationServerConfig(
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private fun generateRsa(): RSAKey {
+	@Throws(IllegalStateException::class)
+	private fun generateOrLoadJwkRsaKey(): RSAKey {
+		if (cfgJwkRsaKeyStoreInDb) {
+			val existsRsaKey = jwkRsaKeyRepository.existsById("default")
+			if (existsRsaKey) {
+				// fetch Key Pair from DB
+				val dbJwkRsaKey: Optional<DbJwkRsaKey?> = jwkRsaKeyRepository.findById("default")
+				if (! dbJwkRsaKey.isPresent) {
+					throw IllegalStateException("DB error when fetching DbJwkRsaKey")
+				}
+				try {
+					return dbJwkRsaKey.get().getRsaKey(encryptionService, cfgJwkRsaKeyPw)
+				} catch (err: BadPaddingException) {
+					// most likely the password has changed. so we'll simply generate a new RSA Key Pair
+				}
+			}
+		}
+		// generate new Key Pair
 		val keyPair: KeyPair = generateRsaKey()
 		val publicKey: RSAPublicKey = keyPair.public as RSAPublicKey
 		val privateKey: RSAPrivateKey = keyPair.private as RSAPrivateKey
-		return RSAKey.Builder(publicKey)
+		val rsaKey = RSAKey.Builder(publicKey)
 				.privateKey(privateKey)
 				.keyID(UUID.randomUUID().toString())
 				.build()
+		// store Key Pair in DB
+		if (cfgJwkRsaKeyStoreInDb) {
+			val dbJwkRsaKey = DbJwkRsaKey.from(encryptionService, cfgJwkRsaKeyPw, "default", rsaKey).build()
+			jwkRsaKeyRepository.save(dbJwkRsaKey)
+		}
+		//
+		return rsaKey
 	}
 
 	@Throws(IllegalStateException::class)

@@ -38,6 +38,7 @@ data class CustomAppProperties(
 				val enablePostmanCallback: Boolean = false,
 				val enableErrorMessagesInWebErrorController: Boolean = false,
 				val db: DbConf,
+				val jwkRsaKeyConf: JwkRsaKeyConf,
 				var users: Map<String, AuthUserConf>,
 				var oauth2Clients: Map<String, OAuth2ClientConf>
 			) {
@@ -45,6 +46,11 @@ data class CustomAppProperties(
 		data class DbConf(
 					val pruneCollections: Boolean = false,
 					val initCollections: Boolean = true
+				)
+
+		data class JwkRsaKeyConf(
+					val storeInDb: Boolean = true,
+					val password: String = ""
 				)
 
 		data class AuthUserConf(
@@ -141,6 +147,9 @@ data class CustomAppProperties(
 		val availRscIds: List<String> = resourceIdToUrlPaths.keys.toList()
 		authServer.users.values.forEach { validateUser(it, availRscIds) }
 		authServer.oauth2Clients.forEach { validateClient(it.key, it.value, availRscIds) }
+		if (authServer.jwkRsaKeyConf.storeInDb && authServer.jwkRsaKeyConf.password.isEmpty()) {
+			throw IllegalStateException("authServer.jwkRsaKeyConf.password must not be empty")
+		}
 	}
 
 	companion object {
