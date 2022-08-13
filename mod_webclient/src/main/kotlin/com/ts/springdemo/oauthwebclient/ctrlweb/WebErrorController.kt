@@ -37,10 +37,6 @@ class WebErrorController : ErrorController {
 				HttpStatus.NO_CONTENT.value() -> "NO CONTENT"
 				else -> "Unknown"
 			}
-			if (statusInt == HttpStatus.UNAUTHORIZED.value()) {
-				model["linkDesc"] = "Login"
-				model["linkUrl"] = "/login"
-			}
 			if (cfgEnableErrMsgs) {
 				val err = request.getAttribute(RequestDispatcher.ERROR_EXCEPTION) as Exception?
 				if (err != null) {
