@@ -57,16 +57,16 @@ class WebUiController(
 		return "ui/root"
 	}
 
-	@GetMapping(value = ["/ui/articles"])
-	fun getUiArticles(model: Model): String {
+	@GetMapping(value = ["/ui/articles/show"])
+	fun getUiArticlesShow(model: Model): String {
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/articles"
 		val dataArr: Array<ApiDataArticle> = getDataArrayFromRscSrv(reqUrl)
 		model["dataArr"] = dataArr
 		return "ui/data/articles_show"
 	}
 
-	@GetMapping(value = ["/ui/products"])
-	fun getUiProducts(model: Model): String {
+	@GetMapping(value = ["/ui/products/show"])
+	fun getUiProductsShow(model: Model): String {
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/products"
 		val dataArr: Array<ApiDataProduct> = getDataArrayFromRscSrv(reqUrl)
 		model["dataArr"] = dataArr
