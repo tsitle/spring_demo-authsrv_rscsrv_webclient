@@ -62,7 +62,7 @@ class WebUiController(
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/articles"
 		val dataArr: Array<ApiDataArticle> = getDataArrayFromRscSrv(reqUrl)
 		model["dataArr"] = dataArr
-		return "ui/data/articles"
+		return "ui/data/articles_show"
 	}
 
 	@GetMapping(value = ["/ui/products"])
@@ -70,7 +70,7 @@ class WebUiController(
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/products"
 		val dataArr: Array<ApiDataProduct> = getDataArrayFromRscSrv(reqUrl)
 		model["dataArr"] = dataArr
-		return "/ui/data/products"
+		return "/ui/data/products_show"
 	}
 
 	@GetMapping(value = ["/ui/showOidcUserInfo"])
