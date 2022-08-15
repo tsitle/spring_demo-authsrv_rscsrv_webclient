@@ -175,7 +175,11 @@ data class CustomAppProperties(
 			}
 		}
 
+		@Throws(IllegalStateException::class)
 		private fun validateClient(clientId: String, clientConf: AuthServer.OAuth2ClientConf, availRscIds: List<String>) {
+			if (clientId.contains("@")) {
+				throw IllegalStateException("invalid Client ID '${clientId}': may not contain '@'")
+			}
 			if (! clientConf.scopesResourceAccess.isNullOrEmpty()) {
 				validateRscIds("OAuthClient '${clientId}'", clientConf.scopesResourceAccess!!.keys.toList(), availRscIds)
 			}
