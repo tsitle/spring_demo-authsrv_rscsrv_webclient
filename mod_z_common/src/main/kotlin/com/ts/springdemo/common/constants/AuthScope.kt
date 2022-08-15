@@ -22,5 +22,7 @@ class AuthScope {
 		OIDC_EMAIL(OIDCScopeValue.EMAIL.value),  // 'email'
 		OIDC_PHONE(OIDCScopeValue.PHONE.value),  // 'phone'
 		OIDC_OFFLINE_ACCESS(OIDCScopeValue.OFFLINE_ACCESS.value),  // 'offline_access'
+		//
+		ACCESS_READ_OTHER_USERS_DATA("access_read_other_users_data")
 	}
 }
