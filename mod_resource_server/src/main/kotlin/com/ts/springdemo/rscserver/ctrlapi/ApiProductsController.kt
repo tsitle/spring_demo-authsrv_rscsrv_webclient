@@ -6,11 +6,13 @@ import com.ts.springdemo.common.entityapi.ApiCrudResponseRead
 import com.ts.springdemo.rscserver.entity.DbDataProduct
 import com.ts.springdemo.rscserver.repository.DbDataProductRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 
 
 @RestController
@@ -19,18 +21,21 @@ class ApiProductsController(
 			private val dbDataProductRepository: DbDataProductRepository
 		) {
 
+	@Throws(ResponseStatusException::class)
 	@GetMapping("/api/v1/products")
 	fun getProducts(): ApiCrudResponseRead<ApiDataProduct> {
 		val authentication = SecurityContextHolder.getContext().authentication
-		val dbProducts: List<DbDataProduct> = if (! authentication?.name.isNullOrEmpty()) {
-				dbDataProductRepository.findByUserId(authentication.name)
-			} else {
-				return ApiCrudResponseRead.Companion.Builder<ApiDataProduct>()
-						.ok(false)
-						.error("no authentication found")
-						.build()
-			}
-
+				?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "OAuth2 Login required")
+		val userEmail: String = authentication.name ?: ""
+		//
+		if (userEmail.isEmpty() || ! userEmail.contains("@")) {
+			return ApiCrudResponseRead.Companion.Builder<ApiDataProduct>()
+					.ok(false)
+					.error("no valid authentication found")
+					.build()
+		}
+		//
+		val dbProducts: List<DbDataProduct> = dbDataProductRepository.findByUserId(userEmail)
 		val listApiData: MutableSet<ApiDataProduct> = mutableSetOf()
 		dbProducts.forEach {
 				listApiData.add(it.toApiDataProduct())
