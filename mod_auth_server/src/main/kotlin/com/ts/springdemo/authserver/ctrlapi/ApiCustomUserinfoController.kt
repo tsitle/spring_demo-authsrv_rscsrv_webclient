@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
 import org.springframework.web.bind.annotation.PostMapping
@@ -76,12 +75,9 @@ class ApiCustomUserinfoController(
 			val authorizedRoles: List<GrantedAuthority> =
 					(oauth2Auth.attributes["java.security.Principal"] as UsernamePasswordAuthenticationToken?)?.authorities?.toList()
 					?: emptyList()
-			val requiredRoleAdmin = SimpleGrantedAuthority(
-					AuthRole.buildAuthRole(AuthRole.EnRoles.GRP_ADMIN)
-				)
-			val requiredRoleRsc = SimpleGrantedAuthority(
-					AuthRole.buildAuthRoleFromArbitraryString(requiredScope)
-				)
+			val requiredRoleAdmin: GrantedAuthority = AuthRole.buildGrantedAuthority(AuthRole.EnRoles.GRP_ADMIN)
+			val requiredRoleRsc: GrantedAuthority = AuthRole.buildGrantedAuthorityFromArbitraryString(requiredScope)
+
 			hasRole = authorizedRoles.contains(requiredRoleAdmin) || authorizedRoles.contains(requiredRoleRsc)
 		}
 		if (! (authorizedScopes.contains(requiredScope) || hasRole)) {

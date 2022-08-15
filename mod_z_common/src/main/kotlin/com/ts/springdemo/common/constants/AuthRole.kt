@@ -1,5 +1,7 @@
 package com.ts.springdemo.common.constants
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+
 @Suppress("unused")
 class AuthRole {
 	companion object {
@@ -30,6 +32,24 @@ class AuthRole {
 				throw IllegalStateException("roleStr must not be empty")
 			}
 			return GA_PREFIX + roleStr.uppercase()
+		}
+
+		fun buildGrantedAuthority(role: EnRoles): SimpleGrantedAuthority {
+			return SimpleGrantedAuthority(
+					buildAuthRole(role)
+				)
+		}
+
+		fun buildGrantedAuthority(roleStr: String): SimpleGrantedAuthority {
+			return SimpleGrantedAuthority(
+					buildAuthRole(roleStr)
+				)
+		}
+
+		fun buildGrantedAuthorityFromArbitraryString(roleStr: String): SimpleGrantedAuthority {
+			return SimpleGrantedAuthority(
+					buildAuthRoleFromArbitraryString(roleStr)
+				)
 		}
 	}
 

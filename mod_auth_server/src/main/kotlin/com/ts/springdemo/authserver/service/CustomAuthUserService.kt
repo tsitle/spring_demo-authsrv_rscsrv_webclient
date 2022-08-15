@@ -6,7 +6,6 @@ import com.ts.springdemo.authserver.entity.CustomAuthUser
 import com.ts.springdemo.authserver.repository.CustomAuthUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -71,18 +70,14 @@ class CustomAuthUserService(
 		val authorities: MutableList<GrantedAuthority> = ArrayList()
 		//
 		authorities.add(
-				SimpleGrantedAuthority(
-						AuthRole.buildAuthRole(user.getRole())
-					)
+				AuthRole.buildGrantedAuthority(user.getRole())
 			)
 		//
 		val rscIdSrvMap = rscIdPathsService.getRscIdToSrvMap(user.getResourceAccess().keys.toList())
 		user.getResourceAccess().forEach { (itRscId: String, itRscMeths: List<AuthRscAcc.EnMeth>) ->
 				itRscMeths.forEach { itRscMeth: AuthRscAcc.EnMeth ->
 						val srv: AuthRscAcc.EnSrv = rscIdSrvMap[itRscId]!!
-						val sga = SimpleGrantedAuthority(
-								AuthRscAcc.buildAuthRole(srv, itRscId, itRscMeth)
-							)
+						val sga: GrantedAuthority = AuthRscAcc.buildGrantedAuthority(srv, itRscId, itRscMeth)
 						authorities.add(sga)
 					}
 			}

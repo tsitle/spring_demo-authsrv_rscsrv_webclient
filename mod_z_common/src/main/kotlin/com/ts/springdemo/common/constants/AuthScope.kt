@@ -1,6 +1,7 @@
 package com.ts.springdemo.common.constants
 
 import com.nimbusds.openid.connect.sdk.OIDCScopeValue
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 
 @Suppress("unused")
@@ -12,6 +13,12 @@ class AuthScope {
 
 		fun buildAuthScope(scope: EnScopes): String {
 			return GA_PREFIX + scope.value
+		}
+
+		fun buildGrantedAuthority(scope: EnScopes): SimpleGrantedAuthority {
+			return SimpleGrantedAuthority(
+					buildAuthScope(scope)
+				)
 		}
 	}
 

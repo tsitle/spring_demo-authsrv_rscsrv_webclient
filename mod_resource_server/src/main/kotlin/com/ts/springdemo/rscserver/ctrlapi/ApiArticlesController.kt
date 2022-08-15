@@ -9,7 +9,6 @@ import com.ts.springdemo.rscserver.entity.DbDataArticle
 import com.ts.springdemo.rscserver.repository.DbDataArticleRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -31,9 +30,7 @@ class ApiArticlesController(
 				?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "OAuth2 Login required")
 		val authenticatedUserName = authentication.name ?: ""
 		val isAllowedToReadOtherUsersData = authentication.authorities.contains(
-					SimpleGrantedAuthority(
-							AuthScope.buildAuthScope(AuthScope.EnScopes.ACCESS_READ_OTHER_USERS_DATA)
-						)
+				AuthScope.buildGrantedAuthority(AuthScope.EnScopes.ACCESS_READ_OTHER_USERS_DATA)
 			)
 		val userEmail: String? = if (queryParamsJson != null && queryParamsJson.userEmail.isNotEmpty()) {
 				queryParamsJson.userEmail

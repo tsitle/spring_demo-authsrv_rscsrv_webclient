@@ -1,6 +1,7 @@
 package com.ts.springdemo.common.constants
 
 import org.springframework.http.HttpMethod
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 
 @Suppress("unused")
@@ -30,6 +31,18 @@ class AuthRscAcc {
 
 		fun buildAuthRoleFromArbitraryString(roleStr: String): String {
 			return AuthRole.buildAuthRoleFromArbitraryString(roleStr)
+		}
+
+		fun buildGrantedAuthority(srv: EnSrv, resourceId: String, httpMethod: EnMeth): SimpleGrantedAuthority {
+			return SimpleGrantedAuthority(
+					buildAuthRole(srv, resourceId, httpMethod)
+				)
+		}
+
+		fun buildGrantedAuthorityFromArbitraryString(roleStr: String): SimpleGrantedAuthority {
+			return SimpleGrantedAuthority(
+					buildAuthRoleFromArbitraryString(roleStr)
+				)
 		}
 
 		@Throws(IllegalStateException::class)
