@@ -63,8 +63,8 @@ class SpringDemoAuthServerApplication(
 				println("----------------------------------------")
 				println("----------------------------------------")
 				println("----------------------------------------")
-				if (customAppProperties.authServer.db.pruneCollections) {
-					pruneCollections()
+				if (customAppProperties.authServer.db.truncateCollections) {
+					truncateCollections()
 					println("----------------------------------------")
 				}
 				if (customAppProperties.authServer.db.initCollections) {
@@ -91,8 +91,8 @@ class SpringDemoAuthServerApplication(
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private fun pruneCollections() {
-		println("Prune Collections")
+	private fun truncateCollections() {
+		println("Truncate Collections")
 		println("  - rscIdPaths")
 		rscIdPathsRepository.deleteAll()
 		println("  - authUser")
