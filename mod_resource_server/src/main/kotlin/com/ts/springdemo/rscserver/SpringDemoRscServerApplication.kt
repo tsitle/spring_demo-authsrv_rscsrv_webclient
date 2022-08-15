@@ -34,8 +34,8 @@ class SpringDemoRscServerApplication(
 				println("----------------------------------------")
 				println("----------------------------------------")
 				println("----------------------------------------")
-				if (customAppProperties.resourceServer.db.pruneCollections) {
-					pruneCollections()
+				if (customAppProperties.resourceServer.db.truncateCollections) {
+					truncateCollections()
 					println("----------------------------------------")
 				}
 				if (customAppProperties.resourceServer.db.initCollections) {
@@ -56,8 +56,8 @@ class SpringDemoRscServerApplication(
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
 
-	private fun pruneCollections() {
-		println("Prune Collections")
+	private fun truncateCollections() {
+		println("Truncate Collections")
 		println("  - dataArticle")
 		dbDataArticleRepository.deleteAll()
 		println("  - dataProduct")

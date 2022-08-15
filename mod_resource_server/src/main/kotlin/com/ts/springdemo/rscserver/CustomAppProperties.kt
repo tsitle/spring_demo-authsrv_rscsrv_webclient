@@ -30,7 +30,7 @@ data class CustomAppProperties(
 			) {
 
 		data class DbConf(
-					val pruneCollections: Boolean = false,
+					val truncateCollections: Boolean = false,
 					val initCollections: Boolean = true
 				)
 
