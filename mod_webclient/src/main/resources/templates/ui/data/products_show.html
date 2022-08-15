@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Web Client: Products</title>
+	<title>Web Client: Show Products</title>
 	<link rel="stylesheet" type="text/css" media="all" th:href="@{/default.css}" />
 </head>
 <body>
-	<h1>Web Client: Products</h1>
+	<h1>Web Client: Show Products</h1>
+
+	<div th:if="${createdMsg ne null and createdMsg ne ''}">
+		<strong th:text="${createdMsg} + ' ID=' + ${createdId}" style="color: green"></strong>
+	</div>
 
 	<h3>Products:</h3>
 	<div th:each="row,iterStat : ${dataArr}" th:class="'rsc_product ' + (${iterStat.odd}? 'odd')">

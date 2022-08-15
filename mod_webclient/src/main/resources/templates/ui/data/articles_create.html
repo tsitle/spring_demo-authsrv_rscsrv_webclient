@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Web Client: Create Articles</title>
+	<link rel="stylesheet" type="text/css" media="all" th:href="@{/default.css}" />
+</head>
+<body>
+	<h1>Web Client: Create Articles</h1>
+
+	<div th:if="${apiError ne null and apiError ne ''}">
+		<strong th:text="|API Error: ${apiError}|" style="color: red"></strong>
+	</div>
+
+	<h3>Article:</h3>
+	<div>
+		<form action="#" th:action="@{${targetUrl}}" th:object="${formDataArticle}" method="post">
+			<table>
+				<tr>
+					<td>
+						<label>User</label>
+					</td>
+					<td>
+						<span th:text="${userId}"></span>
+					</td>
+				</tr>
+				<tr>
+					<td style="vertical-align: top">
+						<label for="lines">Lines</label>
+					</td>
+					<td style="vertical-align: top">
+						<span th:if="${#fields.hasErrors('linesStr')}" th:errors="*{linesStr}" style="color: red; display: block"></span>
+						<textarea id="lines" th:field="*{linesStr}" rows="5" cols="50"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td><input type="submit" value="Submit" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+	<p>
+		<a href="/">
+			<span>Home</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>

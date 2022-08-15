@@ -15,15 +15,15 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class WebClientConfig {
 	@Bean
-	fun webClient(authorizedClientManager: OAuth2AuthorizedClientManager?): WebClient {
-		val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+	fun webClientRscSrv(authorizedClientManagerRscSrv: OAuth2AuthorizedClientManager?): WebClient {
+		val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManagerRscSrv)
 		return WebClient.builder()
 				.apply(oauth2Client.oauth2Configuration())
 				.build()
 	}
 
 	@Bean
-	fun authorizedClientManager(
+	fun authorizedClientManagerRscSrv(
 				clientRegistrationRepository: ClientRegistrationRepository?,
 				authorizedClientRepository: OAuth2AuthorizedClientRepository?
 			): OAuth2AuthorizedClientManager {

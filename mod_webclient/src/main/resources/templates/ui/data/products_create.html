@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Web Client: Create Products</title>
+	<link rel="stylesheet" type="text/css" media="all" th:href="@{/default.css}" />
+</head>
+<body>
+	<h1>Web Client: Create Products</h1>
+
+	<div th:if="${apiError ne null and apiError ne ''}">
+		<strong th:text="|API Error: ${apiError}|" style="color: red"></strong>
+	</div>
+
+	<h3>Products:</h3>
+	<div>
+		<form action="#" th:action="@{${targetUrl}}" th:object="${formDataProduct}" method="post">
+			<table>
+				<tr>
+					<td>
+						<label>User</label>
+					</td>
+					<td>
+						<span th:text="${userId}"></span>
+					</td>
+				</tr>
+				<tr>
+					<td style="vertical-align: top">
+						<label for="desc">Description</label>
+					</td>
+					<td style="vertical-align: top">
+						<span th:if="${#fields.hasErrors('desc')}" th:errors="*{desc}" style="color: red; display: block"></span>
+						<input id="desc" th:field="*{desc}" size="50" />
+					</td>
+				</tr>
+				<tr>
+					<td style="vertical-align: top">
+						<label for="price">Price</label>
+					</td>
+					<td style="vertical-align: top">
+						<span th:if="${#fields.hasErrors('price')}" th:errors="*{price}" style="color: red; display: block"></span>
+						<input type="number" step="0.01" id="price" th:field="*{price}" size="10" />
+					</td>
+				</tr>
+				<tr>
+					<td><input type="submit" value="Submit" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+	<p>
+		<a href="/">
+			<span>Home</span>
+		</a>
+	</p>
+	<p>
+		<a href="/logout">
+			<span>Logout</span>
+		</a>
+	</p>
+</body>
+</html>

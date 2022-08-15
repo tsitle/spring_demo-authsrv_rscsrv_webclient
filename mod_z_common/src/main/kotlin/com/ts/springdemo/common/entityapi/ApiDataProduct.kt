@@ -1,4 +1,4 @@
-package com.ts.springdemo.common.entity
+package com.ts.springdemo.common.entityapi
 
 import org.springframework.util.Assert
 import java.io.Serializable
@@ -10,7 +10,7 @@ data class ApiDataProduct(
 			private var userId: String = "",
 			private var desc: String = "",
 			private var price: Double = -1.0
-		) : Serializable {
+		) : ApiDataInterface {
 
 	fun getId(): String {
 		return id
@@ -30,8 +30,6 @@ data class ApiDataProduct(
 
 
 	companion object {
-		private const val serialVersionUID = "0.0.1"
-
 		fun withId(id: String): Builder {
 			Assert.hasText(id, "id cannot be empty")
 			return Builder(id)

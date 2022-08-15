@@ -1,9 +1,10 @@
 package com.ts.springdemo.rscserver.entity
 
 import org.springframework.data.mongodb.core.mapping.Document
-import com.ts.springdemo.common.entity.ApiDataProduct
+import com.ts.springdemo.common.entityapi.ApiDataProduct
 import org.springframework.util.Assert
 import java.io.Serializable
+import java.util.*
 
 
 @Suppress("unused")
@@ -11,8 +12,8 @@ import java.io.Serializable
 data class DbDataProduct(
 			private var id: String = "",
 			private var userId: String = "",
-			private var desc: String? = null,
-			private var price: Double? = null
+			private var desc: String = "",
+			private var price: Double = -1.0
 		) : Serializable {
 
 	fun getId(): String {
@@ -23,19 +24,19 @@ data class DbDataProduct(
 		return userId
 	}
 
-	fun getDesc(): String? {
+	fun getDesc(): String {
 		return desc
 	}
 
-	fun getPrice(): Double? {
+	fun getPrice(): Double {
 		return price
 	}
 
 	fun toApiDataProduct(): ApiDataProduct {
 		return ApiDataProduct.withId(this.id)
 				.userId(userId)
-				.desc(desc ?: "")
-				.price(price ?: -1.0)
+				.desc(desc)
+				.price(price)
 				.build()
 	}
 
@@ -46,6 +47,10 @@ data class DbDataProduct(
 		fun withId(id: String): Builder {
 			Assert.hasText(id, "id cannot be empty")
 			return Builder(id)
+		}
+
+		fun withRandomId(): Builder {
+			return Builder(UUID.randomUUID().toString())
 		}
 
 		fun from(dbDataProduct: DbDataProduct): Builder {
@@ -98,6 +103,9 @@ data class DbDataProduct(
 			fun build(): DbDataProduct {
 				Assert.hasText(id, "id cannot be empty")
 				Assert.hasText(userId, "userId cannot be empty")
+				Assert.hasText(desc, "desc cannot be empty")
+				Assert.notNull(price, "price cannot be null")
+				Assert.state(price!! >= 0.0, "price must be >= 0.00")
 				return create()
 			}
 
@@ -105,8 +113,8 @@ data class DbDataProduct(
 				val dbDataProduct = DbDataProduct()
 				dbDataProduct.id = id!!
 				dbDataProduct.userId = userId!!
-				dbDataProduct.desc = desc
-				dbDataProduct.price = price
+				dbDataProduct.desc = desc!!
+				dbDataProduct.price = price!!
 				return dbDataProduct
 			}
 		}

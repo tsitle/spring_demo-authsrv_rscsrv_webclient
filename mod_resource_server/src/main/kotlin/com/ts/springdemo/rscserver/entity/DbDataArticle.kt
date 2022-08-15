@@ -1,9 +1,10 @@
 package com.ts.springdemo.rscserver.entity
 
 import org.springframework.data.mongodb.core.mapping.Document
-import com.ts.springdemo.common.entity.ApiDataArticle
+import com.ts.springdemo.common.entityapi.ApiDataArticle
 import org.springframework.util.Assert
 import java.io.Serializable
+import java.util.*
 
 
 @Suppress("unused")
@@ -40,6 +41,10 @@ data class DbDataArticle(
 		fun withId(id: String): Builder {
 			Assert.hasText(id, "id cannot be empty")
 			return Builder(id)
+		}
+
+		fun withRandomId(): Builder {
+			return Builder(UUID.randomUUID().toString())
 		}
 
 		fun from(dbDataArticle: DbDataArticle): Builder {

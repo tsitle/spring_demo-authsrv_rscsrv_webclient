@@ -41,8 +41,8 @@ data class CustomAppProperties(
 
 		data class DataProduct(
 					var userId: String,
-					var desc: String?,
-					var price: Double?
+					var desc: String,
+					var price: Double
 				)
 	}
 }

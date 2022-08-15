@@ -1,7 +1,8 @@
 package com.ts.springdemo.oauthwebclient.ctrlweb
 
-import com.ts.springdemo.common.entity.ApiDataArticle
-import com.ts.springdemo.common.entity.ApiDataProduct
+import com.ts.springdemo.common.entityapi.*
+import com.ts.springdemo.oauthwebclient.entityform.FormDataArticle
+import com.ts.springdemo.oauthwebclient.entityform.FormDataProduct
 import com.ts.springdemo.oauthwebclient.repository.CustomClientRegistrationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -23,16 +24,22 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.*
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
 
 
 @Controller
 class WebUiController(
 			@Autowired
-			private val webClient: WebClient,
+			private val webClientRscSrv: WebClient,
 			@Autowired
 			private val customClientRegistrationRepository: CustomClientRegistrationRepository,
 			@Value("\${custom-app.resource-server.url}")
@@ -57,21 +64,118 @@ class WebUiController(
 		return "ui/root"
 	}
 
+	// -----------------------------------------------------------------------------------------------------------------
+
 	@GetMapping(value = ["/ui/articles/show"])
 	fun getUiArticlesShow(model: Model): String {
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/articles"
-		val dataArr: Array<ApiDataArticle> = getDataArrayFromRscSrv(reqUrl)
-		model["dataArr"] = dataArr
+		val apiResp: ApiCrudResponseRead<ApiDataArticle> = getRecordArrayFromRscSrv(reqUrl)
+		model["dataArr"] = apiResp.getElems()
 		return "ui/data/articles_show"
 	}
+
+	@GetMapping(value = ["/ui/articles/create"])
+	fun getUiArticlesCreate(model: Model): String {
+		model["targetUrl"] = "/ui/articles/create"
+		model["userId"] = getAuthUserId()
+		model["formDataArticle"] = FormDataArticle()
+		return "ui/data/articles_create"
+	}
+
+	@PostMapping(value = ["/ui/articles/create"])
+	fun postUiArticlesCreate(
+				@Valid @ModelAttribute fdArticle: FormDataArticle,
+				errors: BindingResult,
+				model: Model,
+				redirectAttrs: RedirectAttributes
+			): String {
+		var hasErrors = errors.hasErrors()
+
+		if (! hasErrors) {
+			val endpointUri = "$cfgRscSrvUrl/api/v1/articles"
+			val apiDataArticle = ApiDataArticle.withId("bogus")
+					.userId("bogus")
+					.lines(
+							fdArticle.linesStr!!.lines()
+						)
+					.build()
+			val apiResp: ApiCrudResponseCreate = createRecordOnRscSrv(apiDataArticle, endpointUri)
+			if (! apiResp.getOk()) {
+				hasErrors = true
+				model["apiError"] = apiResp.getError()
+			} else {
+				redirectAttrs.addFlashAttribute("createdId", apiResp.getElemId())
+			}
+		}
+
+		if (hasErrors) {
+			model["userId"] = getAuthUserId()
+			model["formDataArticle"] = fdArticle
+			return "ui/data/articles_create"
+		}
+
+		redirectAttrs.addFlashAttribute("createdMsg", "Created a new Article")
+		return "redirect:/ui/articles/show"
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
 
 	@GetMapping(value = ["/ui/products/show"])
 	fun getUiProductsShow(model: Model): String {
 		val reqUrl = "${cfgRscSrvUrl}/api/v1/products"
-		val dataArr: Array<ApiDataProduct> = getDataArrayFromRscSrv(reqUrl)
-		model["dataArr"] = dataArr
+		val apiResp: ApiCrudResponseRead<ApiDataProduct> = getRecordArrayFromRscSrv(reqUrl)
+		model["dataArr"] = apiResp.getElems()
 		return "/ui/data/products_show"
 	}
+
+	@GetMapping(value = ["/ui/products/create"])
+	fun getUiProductsCreate(model: Model): String {
+		model["targetUrl"] = "/ui/products/create"
+		model["userId"] = getAuthUserId()
+		model["formDataProduct"] = FormDataProduct()
+		return "/ui/data/products_create"
+	}
+
+	@PostMapping(value = ["/ui/products/create"])
+	fun postUiProductsCreate(
+				@Valid @ModelAttribute fdProduct: FormDataProduct,
+				errors: BindingResult,
+				model: Model,
+				redirectAttrs: RedirectAttributes
+			): String {
+		var hasErrors = errors.hasErrors()
+
+		if (! hasErrors) {
+			val endpointUri = "$cfgRscSrvUrl/api/v1/products"
+			val apiDataProduct = ApiDataProduct.withId("bogus")
+					.userId("bogus")
+					.desc(
+							fdProduct.desc!!
+						)
+					.price(
+							fdProduct.price!!
+						)
+					.build()
+			val apiResp: ApiCrudResponseCreate = createRecordOnRscSrv(apiDataProduct, endpointUri)
+			if (! apiResp.getOk()) {
+				hasErrors = true
+				model["apiError"] = apiResp.getError()
+			} else {
+				redirectAttrs.addFlashAttribute("createdId", apiResp.getElemId())
+			}
+		}
+
+		if (hasErrors) {
+			model["userId"] = getAuthUserId()
+			model["formDataProduct"] = fdProduct
+			return "ui/data/products_create"
+		}
+
+		redirectAttrs.addFlashAttribute("createdMsg", "Created a new Product")
+		return "redirect:/ui/products/show"
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
 
 	@GetMapping(value = ["/ui/showOidcUserInfo"])
 	fun getUiShowOidcUserInfo(model: Model): String {
@@ -145,16 +249,25 @@ class WebUiController(
 	// -----------------------------------------------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------------------------------------------
 
+	private fun getAuthUserId(): String {
+		val authentication: Authentication = SecurityContextHolder.getContext().authentication
+		if (authentication is OAuth2AuthenticationToken) {
+			val authToken: OAuth2AuthenticationToken = authentication
+			return authToken.name
+		}
+		throw IllegalStateException("cannot determine Auth User ID")
+	}
+
 	private fun getValueOrNull(value: Any?): String {
 		return value?.toString() ?: "NULL"
 	}
 
-	private inline fun <reified T> typeReference() = object : ParameterizedTypeReference<Array<T>>() {}
+	private inline fun <reified T : ApiDataInterface> typeReference() = object : ParameterizedTypeReference<ApiCrudResponseRead<T>>() {}
 
 	@Throws(ClientAuthorizationException::class, ResponseStatusException::class)
-	private inline fun <reified T> getDataArrayFromRscSrv(reqUrl: String): Array<T> {
+	private inline fun <reified T : ApiDataInterface> getRecordArrayFromRscSrv(reqUrl: String): ApiCrudResponseRead<T> {
 		try {
-			return webClient
+			return webClientRscSrv
 					.get()
 					.uri(reqUrl)
 					.attributes(
@@ -177,7 +290,7 @@ class WebUiController(
 				)
 		} catch (err: ClientAuthorizationException) {
 			if (err.error.errorCode == "client_authorization_required") {
-				// This usually happens when the OAuth2 Access Token has expired.
+				// This usually happens when the OAuth2 Access Token has expired or doesn't exist yet.
 				// The Web Client will then automatically fetch a new one.
 				throw err
 			}
@@ -228,5 +341,50 @@ class WebUiController(
 					"error=" + err.message
 				)
 		}
+	}
+
+	@Throws(ResponseStatusException::class)
+	private fun <T : ApiDataInterface> createRecordOnRscSrv(apiData: T, endpointUri: String): ApiCrudResponseCreate {
+		val resErr = ApiCrudResponseCreate.Companion.Builder()
+				.ok(false)
+				.error("unknown")
+		try {
+			return webClientRscSrv
+					.post().uri(endpointUri)
+					.attributes(
+							clientRegistrationId(cfgClientWebAppInternalClientId)
+						)
+					.body(
+							BodyInserters.fromValue(apiData)
+						)
+					.retrieve()
+					.bodyToMono(ApiCrudResponseCreate::class.java)
+					.block()
+					?: throw ResponseStatusException(HttpStatus.NO_CONTENT, "No data received")
+		} catch (err: ClientAuthorizationException) {
+			if (err.error.errorCode == "client_authorization_required") {
+				// This usually happens when the OAuth2 Access Token has expired or doesn't exist yet.
+				// The Web Client will then automatically fetch a new one.
+				throw err
+			}
+			throw ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"ClientAuthorizationException, " +
+					"method=POST, " +
+					"url=$endpointUri, " +
+					"error=" + err.message + ", " +
+					"errorCode=" + err.error.errorCode
+				)
+		} catch (err: WebClientResponseException.BadRequest) {
+			resErr.error("BadRequest, URL=${endpointUri}, Message: ${err.message}")
+		} catch (err: WebClientResponseException.Unauthorized) {
+			resErr.error("Unauthorized, URL=$endpointUri")
+		} catch (err: WebClientResponseException.Forbidden) {
+			resErr.error("Forbidden, URL=$endpointUri")
+		} catch (err: WebClientResponseException.NotFound) {
+			resErr.error("NotFound, URL=$endpointUri")
+		} catch (err: WebClientResponseException.MethodNotAllowed) {
+			resErr.error("MethodNotAllowed, URL=$endpointUri")
+		}
+		return resErr.build()
 	}
 }
