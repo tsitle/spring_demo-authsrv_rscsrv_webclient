@@ -137,7 +137,7 @@ class SpringDemoAuthServerApplication(
 				if (dbExistingUser != null) {
 					println("  --> already existed. skipping.")
 				} else {
-					val convRscAcc = convertRscAccMap(it.value.rolesResourceAccess)
+					val convRscAcc = convertRscAccMap(it.value.resourceAccess)
 					val dbNewUser = CustomAuthUser.withRandomId()
 							.email(userEmail)
 							.password(passwordEncoder.encode(it.value.password))
@@ -214,7 +214,7 @@ class SpringDemoAuthServerApplication(
 			return
 		}
 		val clientSecret = clientConf.clientSecret
-		val scopesList: List<String> = getScopesList(clientConf.additionalScopes, clientConf.scopesResourceAccess)
+		val scopesList: List<String> = getScopesList(clientConf.additionalScopes, clientConf.resourceAccess)
 		val cwaUrl = customAppProperties.clientWebApp.url
 
 		val dbRegClient = RegisteredClient.withId(UUID.randomUUID().toString())

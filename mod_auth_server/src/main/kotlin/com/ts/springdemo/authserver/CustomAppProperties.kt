@@ -59,7 +59,7 @@ data class CustomAppProperties(
 					var password: String,
 					var enabled: Boolean = true,
 					var oidcInfo: OidcInfo,
-					var rolesResourceAccess: Map<String, ResourceAccessUriMethods>?
+					var resourceAccess: Map<String, ResourceAccessUriMethods>?
 				) {
 
 			data class OidcInfo(
@@ -122,7 +122,7 @@ data class CustomAppProperties(
 					var clientSecret: String,
 					var additionalScopes: MutableList<AuthScope.EnScopes> = mutableListOf(),
 					var authorizationGrantTypes: List<OauthGrantType.EnGrantType>,
-					var scopesResourceAccess: Map<String, ResourceAccessUriMethods>?
+					var resourceAccess: Map<String, ResourceAccessUriMethods>?
 				)
 
 		data class ResourceAccessUriMethods(
@@ -170,8 +170,8 @@ data class CustomAppProperties(
 			if (user.password.isEmpty()) {
 				throw IllegalStateException("password must not be empty")
 			}
-			if (! user.rolesResourceAccess.isNullOrEmpty()) {
-				validateRscIds("AuthUser '${user.email}'", user.rolesResourceAccess!!.keys.toList(), availRscIds)
+			if (! user.resourceAccess.isNullOrEmpty()) {
+				validateRscIds("AuthUser '${user.email}'", user.resourceAccess!!.keys.toList(), availRscIds)
 			}
 		}
 
@@ -180,8 +180,8 @@ data class CustomAppProperties(
 			if (clientId.contains("@")) {
 				throw IllegalStateException("invalid Client ID '${clientId}': may not contain '@'")
 			}
-			if (! clientConf.scopesResourceAccess.isNullOrEmpty()) {
-				validateRscIds("OAuthClient '${clientId}'", clientConf.scopesResourceAccess!!.keys.toList(), availRscIds)
+			if (! clientConf.resourceAccess.isNullOrEmpty()) {
+				validateRscIds("OAuthClient '${clientId}'", clientConf.resourceAccess!!.keys.toList(), availRscIds)
 			}
 		}
 
