@@ -16,7 +16,8 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 kapt.includeCompileClasspath=false
 
 application {
-	mainClass.set("com.ts.springdemo.authserver.SpringDemoAuthServerApplication")
+	// the class name needs to be appended with "Kt" so that gradle knows that it is a Kotlin application
+	mainClass.set("com.ts.springdemo.authserver.SpringDemoAuthServerApplicationKt")
 }
 
 configurations {
