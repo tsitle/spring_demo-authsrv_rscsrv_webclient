@@ -1,14 +1,14 @@
-version: '3.1'
+version: '3.7'
 
 services:
-  mongo:
+  spring-demo-mongo:
     image: mongo
     ports:
       - "27017:27017"
     volumes:
-      #- $PWD/mpdata:/data/db
-      - $PWD/user_setup/create_user-authsrv.js:/docker-entrypoint-initdb.d/create_user-authsrv.js:ro
-      - $PWD/user_setup/create_user-rscsrv.js:/docker-entrypoint-initdb.d/create_user-rscsrv.js:ro
+      #- $PWD/mp_mongodb_data:/data/db
+      - $PWD/mp_mongodb_user_setup/create_user-authsrv.js:/docker-entrypoint-initdb.d/create_user-authsrv.js:ro
+      - $PWD/mp_mongodb_user_setup/create_user-rscsrv.js:/docker-entrypoint-initdb.d/create_user-rscsrv.js:ro
     restart: always
     stdin_open: false
     tty: false
@@ -17,14 +17,16 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: abcd
       MONGO_INITDB_DATABASE: admin
 
-  mongo-express:
+  spring-demo-mongo-express:
     image: mongo-express
     ports:
       - "8070:8081"
     restart: always
     stdin_open: false
     tty: false
+    depends_on:
+      - spring-demo-mongo
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: abcd
-      ME_CONFIG_MONGODB_URL: mongodb://root:abcd@mongo:27017/admin
+      ME_CONFIG_MONGODB_URL: mongodb://root:abcd@spring-demo-mongo:27017/admin

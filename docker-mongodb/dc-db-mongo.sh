@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# by TS, May 2019
+# by TS, May 2019, Aug 2022
 #
 
 # ----------------------------------------------------------
@@ -86,7 +86,7 @@ LVAR_DEBIAN_DIST="$(_getCpuArch debian_dist)"
 
 # ----------------------------------------------------------
 
-VAR_DC_SERVICE_DEF="mongo"
+VAR_DC_SERVICE_DEF="spring-demo-mongo"
 
 function printUsageAndExit() {
 	echo "Usage: $VAR_MYNAME <COMMAND> ..." >/dev/stderr
