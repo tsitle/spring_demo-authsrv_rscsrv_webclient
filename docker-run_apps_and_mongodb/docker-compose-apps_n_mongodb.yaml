@@ -1,0 +1,75 @@
+version: '3.7'
+
+services:
+  spring-demo-authsrv:
+    image: eclipse-temurin:18
+    ports:
+      - "9000:9000"
+    volumes:
+      - $PWD/mp_authsrv_gradlecache:/root/.gradle
+      - $PWD/mp_authsrv_app:/root/app
+    stdin_open: false
+    tty: false
+    depends_on:
+      - spring-demo-mongo
+    working_dir: /root/app
+    command: ./gradlew :mod_auth_server:run
+
+  spring-demo-rscsrv:
+    image: eclipse-temurin:18
+    ports:
+      - "8090:8090"
+    volumes:
+      - $PWD/mp_rscsrv_gradlecache:/root/.gradle
+      - $PWD/mp_rscsrv_app:/root/app
+    stdin_open: false
+    tty: false
+    depends_on:
+      - spring-demo-mongo
+      - spring-demo-authsrv
+    working_dir: /root/app
+    command: ./gradlew :mod_resource_server:run
+
+  spring-demo-webclient:
+    image: eclipse-temurin:18
+    ports:
+      - "8080:8080"
+    volumes:
+      - $PWD/mp_webclient_gradlecache:/root/.gradle
+      - $PWD/mp_webclient_app:/root/app
+    stdin_open: false
+    tty: false
+    depends_on:
+      - spring-demo-mongo
+      - spring-demo-authsrv
+      - spring-demo-rscsrv
+    working_dir: /root/app
+    command: ./gradlew :mod_webclient:run
+
+  spring-demo-mongo:
+    image: mongo
+    volumes:
+      #- $PWD/mp_mongo_data:/data/db
+      - $PWD/mp_mongodb_user_setup/create_user-authsrv.js:/docker-entrypoint-initdb.d/create_user-authsrv.js:ro
+      - $PWD/mp_mongodb_user_setup/create_user-rscsrv.js:/docker-entrypoint-initdb.d/create_user-rscsrv.js:ro
+    restart: always
+    stdin_open: false
+    tty: false
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: abcd
+      MONGO_INITDB_DATABASE: admin
+
+  spring-demo-mongo-express:
+    image: mongo-express
+    ports:
+      - "8070:8081"
+    restart: always
+    stdin_open: false
+    tty: false
+    depends_on:
+      - spring-demo-mongo
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: abcd
+      ME_CONFIG_MONGODB_URL: mongodb://root:abcd@spring-demo-mongo:27017/admin
