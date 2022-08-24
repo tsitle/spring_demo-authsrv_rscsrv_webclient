@@ -2,15 +2,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar  // for 'val bootJar: BootJar by tasks'
 
 plugins {
-	// Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-	kotlin("jvm") version "1.6.21"
-
 	// Apply the java-library plugin for API and implementation separation.
 	`java-library`
 
-	id("org.springframework.boot") version "2.7.1"
-	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	kotlin("plugin.spring") version "1.6.21"
+	id("org.springframework.boot")  // the version has been defined in /build.gradle.kts
+	id("io.spring.dependency-management")  // the version has been defined in /build.gradle.kts
+
+	// Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin
+	kotlin("jvm")  // the version has been defined in /build.gradle.kts
+
+	kotlin("plugin.spring")  // the version has been defined in /build.gradle.kts
 }
 
 group = "com.ts"
