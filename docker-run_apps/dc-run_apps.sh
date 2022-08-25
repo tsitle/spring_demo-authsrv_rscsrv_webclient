@@ -137,7 +137,7 @@ function _createDockComp() {
 	return 0
 }
 
-VAR_DCY_INP="docker-compose-apps_n_mongodb.yaml"
+VAR_DCY_INP="docker-compose-apps.yaml"
 
 VAR_PROJNAME="springdemo-jdk"
 
@@ -190,14 +190,15 @@ function _syncApps() {
 				mp_webclient_app/ || exit 1
 
 		#
+		local TMP_DOCKER_HOST="host.docker.internal"
 		sed -i '' \
-				-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host=spring-demo-mongo;g' \
+				-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host='$TMP_DOCKER_HOST';g' \
 				mp_authsrv_app/mod_auth_server/src/main/resources/application.properties
 		sed -i '' \
-				-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host=spring-demo-mongo;g' \
+				-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host='$TMP_DOCKER_HOST';g' \
 				mp_rscsrv_app/mod_resource_server/src/main/resources/application.properties
 		sed -i '' \
-				-e 's;custom-app.resource-server.url=.*;custom-app.resource-server.url=http://spring-demo-rscsrv:8090;g' \
+				-e 's;custom-app.resource-server.url=.*;custom-app.resource-server.url=http://'$TMP_DOCKER_HOST':8090;g' \
 				mp_webclient_app/mod_webclient/src/main/resources/application.properties
 
 		#

@@ -26,42 +26,10 @@ you'll need nothing more than
 - Recommended IDE: IntelliJ Ultimate
 
 
-## Run everything in a Docker-Compose environment
-
-You can use the Docker-Compose environment that comes with this repository.  
-To start everything run:
-
-```
-$ ./docker-run_apps_and_mongodb/dc-run_apps_and_mongodb.sh up
-```
-
-And to stop everything run:
-
-```
-$ ./docker-run_apps_and_mongodb/dc-run_apps_and_mongodb.sh down
-```
-
-Please note that when starting the applications it can take quite a while until everything
-is up and running. One way of monitoring the activities in the individual Docker containers
-is to run:
-
-```
-$ docker stats
-```
-
-To see the log output of all containers you can run:
-
-```
-$ ./docker-run_apps_and_mongodb/dc-run_apps_and_mongodb.sh logs -f
-```
-
-
-## Run the apps directly on your host machine plus MongoDB in a Docker-Compose environment
-
-### MongoDB
+## MongoDB + Mongo Express in Docker Containers
 
 Both the Authorization and Resource Server need a running MongoDB instance.  
-You can use the Docker-Compose environment that comes with this repository.  
+You can use the MongoDB Docker-Compose environment that comes with this repository.  
 To start MongoDB and Mongo Express (Database Web Frontend) run:
 
 ```
@@ -74,8 +42,6 @@ And to stop the Docker containers run:
 $ ./docker-mongodb/dc-db-mongo.sh down
 ```
 
-**Note** that you can only run either `docker-run_apps_and_mongodb` or `docker-mongodb` at the same time.
-
 ---
 
 Starting the Docker-Compose environment will
@@ -86,11 +52,47 @@ Starting the Docker-Compose environment will
 - create the user for the Resource Server
 - and start a Mongo Express instance which can then be used to look inside the DB
 
-### Mongo Express
+---
 
-When using the Docker-Compose environments that come with this repository
-you can reach the web interface of Mongo Express here:  
-[http://127.0.0.1:8070/](http://127.0.0.1:8070/)
+#### MongoDB
+
+The MongoDB server will run on port 27017.
+
+#### Mongo Express
+
+Mongo Express web interface: [http://127.0.0.1:8070/](http://127.0.0.1:8070/)
+
+
+## Run the apps in a Docker Containers
+
+To start all apps at once run:
+
+```
+$ ./docker-run_apps/dc-run_apps.sh up
+```
+
+And to stop all the apps run:
+
+```
+$ ./docker-run_apps/dc-run_apps.sh down
+```
+
+**Please note** that when starting the applications it can **take quite a while** until everything
+is up and running. One way of monitoring the activities in the individual Docker containers
+is to run:
+
+```
+$ docker stats
+```
+
+To see the log output of all containers you can run:
+
+```
+$ ./docker-run_apps/dc-run_apps.sh logs -f
+```
+
+
+## Run the apps directly on your host machine
 
 ### Applications (Authorization Server + Resource Server + Web Client)
 
