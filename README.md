@@ -74,6 +74,8 @@ And to stop the Docker containers run:
 $ ./docker-mongodb/dc-db-mongo.sh down
 ```
 
+**Note** that you can only run either `docker-run_apps_and_mongodb` or `docker-mongodb` at the same time.
+
 ---
 
 Starting the Docker-Compose environment will
