@@ -121,11 +121,11 @@ All the configuration can be found in
 
 Default Users (can be found in `application.properties`):
 
-| Username               | Password |
-|------------------------|----------|
-| admin@springdemo.org   | pw       |
-| regular@springdemo.org | pw       |
-| nobody@springdemo.org  | pw       |
+| Username                  | Password |
+|---------------------------|----------|
+| `admin@springdemo.org`    | pw       |
+| `regular@springdemo.org`  | pw       |
+| `nobody@springdemo.org`   | pw       |
 
 
 ## Resource Server
