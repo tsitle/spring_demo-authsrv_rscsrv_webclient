@@ -256,9 +256,6 @@ if [ "$OPT_CMD" = "up" ]; then
 
 	# now start services in background
 	docker-compose -p "$VAR_PROJNAME" -f "$VAR_DCY_INP" start || exit 1
-
-	# now start the individual apps
-	#command: /bin/sh -c ./gradlew :mod_auth_server:bootJar && java -jar mod_auth_server/build/libs/mod_auth_server-0.0.1-SNAPSHOT.jar
 fi
 
 exit 0
