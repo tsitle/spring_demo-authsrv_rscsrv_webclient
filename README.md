@@ -155,6 +155,9 @@ All the configuration can be found in
 
 ## Further Reading
 
+Here's my blog article that discusses this demo:  
+[TLTB: Java Spring Boot Security Demo (with MongoDB)](https://tltb.slur97.org/java-spring-security-5-7-demo/)
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 
