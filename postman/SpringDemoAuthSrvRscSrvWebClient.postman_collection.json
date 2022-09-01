@@ -1,0 +1,1201 @@
+{
+	"info": {
+		"_postman_id": "2afb1470-dbda-498f-8bcd-7bf23869c87b",
+		"name": "SpringDemoAuthSrvRscSrvWebClient",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth ManualToken ClientCreds GetToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"access_token\", data.access_token);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{oauthClientAutomated}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}} {{oauthScopeOidcAll}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{oauthAccessTokenUrl}}",
+					"host": [
+						"{{oauthAccessTokenUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth UserInfo AuthCode",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "as_ac_defaultclient_userinfo",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientDefault}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:8080/authorized",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{authServerBaseUrl}}/userinfo",
+					"host": [
+						"{{authServerBaseUrl}}"
+					],
+					"path": [
+						"userinfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth CustomUserInfoBasic Basic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{userNameRegular}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{userPw}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{authServerBaseUrl}}/api/v1/userinfo/basicauth",
+					"host": [
+						"{{authServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"userinfo",
+						"basicauth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth CustomUserInfoOauth ClientCreds",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "as_cc_automatedclient_CustomUserInfoOauth",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}} {{oauthScopeAsPostUserinfo}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientAutomated}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:8080/authorized",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "queryUserEmail",
+							"value": "{{userNameRegular}}",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{authServerBaseUrl}}/api/v1/userinfo/oauth",
+					"host": [
+						"{{authServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"userinfo",
+						"oauth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc CustomUserinfo AuthCode",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "rs_ac_defaultclient_CustomUserInfo",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientDefault}}",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:8080/authorized",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "queryUserEmail",
+							"value": "{{userNameRegular}}",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/userinfo",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"userinfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc CustomUserinfo CliendCreds",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "rs_cc_automatedclient_CustomUserInfo",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}} {{oauthScopeOidcAll}} {{oauthScopeRsPostUserinfo}} {{oauthScopeAsPostUserinfo}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientAutomated}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://auth-server:9000/oauth2/authorize",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:8080/authorized",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "queryUserEmail",
+							"value": "{{userNameNobody}}",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/userinfo",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"userinfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc Articles ClientCreds Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}} {{oauthScopeReadOtherUsersData}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "rs_cc_automatedclient_Articles",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientAutomated}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://auth-server:9000/user",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:9000/authorized",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userEmail\": \"{{userNameRegular}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/articles",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"articles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc Articles AuthCode Get",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "rs_ac_defaultclient_Articles",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientDefault}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:8080/authorized",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/articles",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"articles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc Articles AuthCode Create",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "rs_ac_defaultclient_Articles",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientDefault}}",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:9000/authorized",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"lines\": [\n        \"Postman Line #1\",\n        \"Line #2 FOO\",\n        \"Line #3 BAR\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/articles",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"articles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc Products AuthCode Get",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "rs_ac_defaultclient_Products",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientDefault}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:9000/authorized",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/products",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rsc Products AuthCode Create",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "rs_ac_defaultclient_Products",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{oauthClientDefault}}",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{oauthScopeOpenid}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{oauthAuthUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{oauthPw}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{oauthAccessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://127.0.0.1:9000/authorized",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "callBackUrl",
+							"type": "any"
+						},
+						{
+							"key": "clientAuth",
+							"type": "any"
+						},
+						{
+							"key": "grantType",
+							"type": "any"
+						},
+						{
+							"key": "username",
+							"type": "any"
+						},
+						{
+							"key": "password",
+							"type": "any"
+						},
+						{
+							"key": "redirectUri",
+							"type": "any"
+						},
+						{
+							"key": "refreshToken",
+							"type": "any"
+						},
+						{
+							"key": "useBrowser",
+							"value": true,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"desc\": \"Postman Regular Example1\",\n    \"price\": 1234.5678\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{rscServerBaseUrl}}/api/v1/products",
+					"host": [
+						"{{rscServerBaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
