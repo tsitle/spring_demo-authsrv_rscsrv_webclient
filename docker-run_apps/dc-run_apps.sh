@@ -153,67 +153,67 @@ VAR_PROJNAME="springdemo-jdk"
 # ----------------------------------------------------------
 
 function _syncApps() {
-		echo -e "\n-------------------------------"
-		echo      "- Syncing Auth Server Sources -"
-		echo      "-------------------------------"
-		rsync -va --delete --exclude=build --exclude=.DS_Store \
-				../gradle \
-				../gradlew \
-				../build.gradle.kts \
-				../settings.gradle.kts \
-				../mod_auth_server \
-				../mod_z_common \
-				mp_authsrv_app/ || exit 1
+	echo -e "\n-------------------------------"
+	echo      "- Syncing Auth Server Sources -"
+	echo      "-------------------------------"
+	rsync -va --delete --exclude=build --exclude=.DS_Store \
+			../gradle \
+			../gradlew \
+			../build.gradle.kts \
+			../settings.gradle.kts \
+			../mod_auth_server \
+			../mod_z_common \
+			mp_authsrv_app/ || exit 1
 
-		echo -e "\n-----------------------------------"
-		echo      "- Syncing Resource Server Sources -"
-		echo      "-----------------------------------"
-		rsync -va --delete --exclude=build --exclude=.DS_Store \
-				../gradle \
-				../gradlew \
-				../build.gradle.kts \
-				../settings.gradle.kts \
-				../mod_resource_server \
-				../mod_z_common \
-				mp_rscsrv_app/ || exit 1
+	echo -e "\n-----------------------------------"
+	echo      "- Syncing Resource Server Sources -"
+	echo      "-----------------------------------"
+	rsync -va --delete --exclude=build --exclude=.DS_Store \
+			../gradle \
+			../gradlew \
+			../build.gradle.kts \
+			../settings.gradle.kts \
+			../mod_resource_server \
+			../mod_z_common \
+			mp_rscsrv_app/ || exit 1
 
-		echo -e "\n------------------------------"
-		echo      "- Syncing Web Client Sources -"
-		echo      "------------------------------"
-		rsync -va --delete --exclude=build --exclude=.DS_Store \
-				../gradle \
-				../gradlew \
-				../build.gradle.kts \
-				../settings.gradle.kts \
-				../mod_webclient \
-				../mod_z_common \
-				mp_webclient_app/ || exit 1
+	echo -e "\n------------------------------"
+	echo      "- Syncing Web Client Sources -"
+	echo      "------------------------------"
+	rsync -va --delete --exclude=build --exclude=.DS_Store \
+			../gradle \
+			../gradlew \
+			../build.gradle.kts \
+			../settings.gradle.kts \
+			../mod_webclient \
+			../mod_z_common \
+			mp_webclient_app/ || exit 1
 
-		#
-		local TMP_DOCKER_HOST="host.docker.internal"
-		sed -i '' \
-				-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host='$TMP_DOCKER_HOST';g' \
-				mp_authsrv_app/mod_auth_server/src/main/resources/application.properties
-		sed -i '' \
-				-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host='$TMP_DOCKER_HOST';g' \
-				mp_rscsrv_app/mod_resource_server/src/main/resources/application.properties
-		sed -i '' \
-				-e 's;custom-app.resource-server.url=.*;custom-app.resource-server.url=http://'$TMP_DOCKER_HOST':8090;g' \
-				mp_webclient_app/mod_webclient/src/main/resources/application.properties
+	#
+	local TMP_DOCKER_HOST="host.docker.internal"
+	sed -i '' \
+			-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host='$TMP_DOCKER_HOST';g' \
+			mp_authsrv_app/mod_auth_server/src/main/resources/application.properties
+	sed -i '' \
+			-e 's;spring.data.mongodb.host=.*;spring.data.mongodb.host='$TMP_DOCKER_HOST';g' \
+			mp_rscsrv_app/mod_resource_server/src/main/resources/application.properties
+	sed -i '' \
+			-e 's;custom-app.resource-server.url=.*;custom-app.resource-server.url=http://'$TMP_DOCKER_HOST':8090;g' \
+			mp_webclient_app/mod_webclient/src/main/resources/application.properties
 
-		#
-		sed -i '' \
-				-e 's,include("mod_resource_server"),,g' \
-				-e 's,include("mod_webclient"),,g' \
-				mp_authsrv_app/settings.gradle.kts
-		sed -i '' \
-				-e 's,include("mod_auth_server"),,g' \
-				-e 's,include("mod_webclient"),,g' \
-				mp_rscsrv_app/settings.gradle.kts
-		sed -i '' \
-				-e 's,include("mod_auth_server"),,g' \
-				-e 's,include("mod_resource_server"),,g' \
-				mp_webclient_app/settings.gradle.kts
+	#
+	sed -i '' \
+			-e 's,include("mod_resource_server"),,g' \
+			-e 's,include("mod_webclient"),,g' \
+			mp_authsrv_app/settings.gradle.kts
+	sed -i '' \
+			-e 's,include("mod_auth_server"),,g' \
+			-e 's,include("mod_webclient"),,g' \
+			mp_rscsrv_app/settings.gradle.kts
+	sed -i '' \
+			-e 's,include("mod_auth_server"),,g' \
+			-e 's,include("mod_resource_server"),,g' \
+			mp_webclient_app/settings.gradle.kts
 }
 
 # ----------------------------------------------------------
